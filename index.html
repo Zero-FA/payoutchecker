@@ -369,7 +369,7 @@ function render(){
   }else if(val==="denied"){
     fields.payoutStatusHelp.textContent = "If your last payout was denied, the 8-day count and the 5-day ≥ $50 requirement start the day after that denial.";
   }else{
-    fields.payoutStatusHelp.textContent = "If your last payout was approved, the 8-day count starts the day after that approval.";
+    fields.payoutStatusHelp.textContent = "If your last payout was approved, the 8-day count and the 5-day ≥ $50 requirement start the day after that denial.";
   }
 
   const res = evaluate(getInputs());
