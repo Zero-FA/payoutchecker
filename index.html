@@ -46,7 +46,9 @@
   <div class="h1">Apex PA Payout Checker</div>
   <div class="sub">Quickly validate payout eligibility per account and payout number.</div>
 
-<div class="grid" style="gap:16px">
+  <!-- MAIN GRID: form left, everything else right -->
+  <div class="grid cols3" style="gap:16px; align-items:start">
+
     <!-- LEFT: Inputs -->
     <div class="card">
       <!-- Top section: account + history -->
@@ -125,8 +127,8 @@
     </div>
     <!-- /LEFT card -->
 
-    <!-- RIGHT: Summary -->
-<div class="grid cols3" style="gap:16px">
+    <!-- RIGHT: Summary + other boxes stacked -->
+    <div class="grid" style="gap:16px">
       <div id="summaryCard" class="card" style="border-color:#144f33">
         <div class="row">
           <svg class="ok" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
