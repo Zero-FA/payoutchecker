@@ -33,9 +33,6 @@
   .list li:last-child{border-bottom:0}
   .mono{font:12px ui-monospace,Consolas,Menlo,monospace}
   .tests{font-size:12px;color:var(--muted)}
-  .btn{border:1px solid #2a364a;background:#101a2e;color:var(--ink);border-radius:10px;
-       padding:8px 10px;cursor:pointer}
-  .btn:hover{background:#0c1528}
   hr{border:none;border-top:1px solid #1a2234;margin:12px 0}
   @media (max-width:920px){ .cols3,.cols2{grid-template-columns:1fr} }
   svg{flex:0 0 auto}
@@ -46,94 +43,97 @@
   <div class="h1">Apex PA Payout Checker</div>
   <div class="sub">Quickly validate payout eligibility per account and payout number.</div>
 
-  <!-- MAIN GRID: form left; everything else right -->
+  <!-- MAIN GRID: left column + right column -->
   <div class="grid cols3" style="gap:16px; align-items:start">
 
-    <!-- LEFT: Inputs -->
-    <div class="card">
-      <!-- Top section: account + history -->
-      <div class="grid cols2">
-        <div>
-          <div class="label">PA Status</div>
-          <select id="paStatus" class="select">
-            <option>Active</option>
-            <option>Account Blown</option>
-            <option>Failed Rebill</option>
-            <option>User Cancelled</option>
-          </select>
-        </div>
-        <div>
-          <div class="label">Account Size</div>
-          <select id="account" class="select">
-            <option value="25k">$25k</option>
-            <option value="50k" selected>$50k</option>
-            <option value="100k">$100k</option>
-            <option value="150k">$150k</option>
-            <option value="250k">$250k</option>
-            <option value="300k">$300k</option>
-            <option value="100kStatic">$100k Static</option>
-          </select>
+    <!-- LEFT COLUMN (stacked) -->
+    <div class="left-col grid" style="gap:16px">
+      <!-- Inputs card -->
+      <div class="card">
+        <!-- Top section: account + history -->
+        <div class="grid cols2">
+          <div>
+            <div class="label">PA Status</div>
+            <select id="paStatus" class="select">
+              <option>Active</option>
+              <option>Account Blown</option>
+              <option>Failed Rebill</option>
+              <option>User Cancelled</option>
+            </select>
+          </div>
+          <div>
+            <div class="label">Account Size</div>
+            <select id="account" class="select">
+              <option value="25k">$25k</option>
+              <option value="50k" selected>$50k</option>
+              <option value="100k">$100k</option>
+              <option value="150k">$150k</option>
+              <option value="250k">$250k</option>
+              <option value="300k">$300k</option>
+              <option value="100kStatic">$100k Static</option>
+            </select>
+          </div>
+
+          <div>
+            <div class="label">Approved Payouts So Far</div>
+            <input id="approvedCount" class="input" type="number" min="0" placeholder="e.g., 0" />
+            <div class="help">Enter how many payouts have already been <b>approved</b>. The 4th no longer requires the safety net. The 6th removes the 30% rule and caps.</div>
+          </div>
+
+          <div>
+            <div class="label">Last Payout Status</div>
+            <select id="payoutStatus" class="select">
+              <option value="none">None yet</option>
+              <option value="approved">Approved</option>
+              <option value="denied">Denied</option>
+            </select>
+            <div id="payoutStatusHelp" class="help">All trading days since starting this PA count toward payout eligibility.</div>
+          </div>
+
+          <div class="row" style="padding-top:28px">
+            <input id="isLiveProp" type="checkbox" />
+            <label for="isLiveProp">Live Prop Account (lifts 30% rule)</label>
+          </div>
         </div>
 
-        <div>
-          <div class="label">Approved Payouts So Far</div>
-          <input id="approvedCount" class="input" type="number" min="0" placeholder="e.g., 0" />
-          <div class="help">Enter how many payouts have already been <b>approved</b>. The 4th no longer requires the safety net. The 6th removes the 30% rule and caps.</div>
-        </div>
+        <hr />
 
-        <div>
-          <div class="label">Last Payout Status</div>
-          <select id="payoutStatus" class="select">
-            <option value="none">None yet</option>
-            <option value="approved">Approved</option>
-            <option value="denied">Denied</option>
-          </select>
-          <div id="payoutStatusHelp" class="help">All trading days since starting this PA count toward payout eligibility.</div>
-        </div>
+        <!-- Bottom section: balances + performance -->
+        <div class="grid cols2">
+          <div>
+            <div class="label">Current Balance ($)</div>
+            <input id="currentBalance" class="input" inputmode="decimal" placeholder="e.g., 52600" />
+          </div>
+          <div>
+            <div class="label">Desired Payout ($)</div>
+            <input id="requestedPayout" class="input" inputmode="decimal" placeholder="e.g., 500" />
+            <div class="help">Min $500. Caps apply for first 5 payouts.</div>
+          </div>
 
-        <div class="row" style="padding-top:28px">
-          <input id="isLiveProp" type="checkbox" />
-          <label for="isLiveProp">Live Prop Account (lifts 30% rule)</label>
+          <div>
+            <div class="label">Highest Profit Day Since Last Approval</div>
+            <input id="highestProfitDay" class="input" inputmode="decimal" placeholder="e.g., 600" />
+          </div>
+          <div>
+            <div class="label">Trading Days Since Last Request</div>
+            <input id="tradingDays" class="input" type="number" min="0" placeholder="e.g., 8" />
+          </div>
+          <div>
+            <div class="label">Profitable Days ≥ $50 Since Last Approval</div>
+            <input id="profitableDays" class="input" type="number" min="0" placeholder="e.g., 5" />
+          </div>
         </div>
       </div>
 
-      <hr />
-
-      <!-- Bottom section: balances + performance -->
-      <div class="grid cols2">
-        <div>
-          <div class="label">Current Balance ($)</div>
-          <input id="currentBalance" class="input" inputmode="decimal" placeholder="e.g., 52600" />
-        </div>
-        <div>
-          <div class="label">Desired Payout ($)</div>
-          <input id="requestedPayout" class="input" inputmode="decimal" placeholder="e.g., 500" />
-          <div class="help">Min $500. Caps apply for first 5 payouts.</div>
-        </div>
-
-        <div>
-          <div class="label">Highest Profit Day Since Last Approval</div>
-          <input id="highestProfitDay" class="input" inputmode="decimal" placeholder="e.g., 600" />
-        </div>
-        <div>
-          <div class="label">Trading Days Since Last Request</div>
-          <input id="tradingDays" class="input" type="number" min="0" placeholder="e.g., 8" />
-        </div>
-        <div>
-          <div class="label">Profitable Days ≥ $50 Since Last Approval</div>
-          <input id="profitableDays" class="input" type="number" min="0" placeholder="e.g., 5" />
-        </div>
+      <!-- What to fix (moved under inputs, still hidden until needed) -->
+      <div id="adviceWrap" class="card" style="display:none">
+        <div style="font-weight:600;margin-bottom:6px">What to fix</div>
+        <ul id="adviceList" class="list"></ul>
       </div>
     </div>
-    <!-- /LEFT card -->
+    <!-- /LEFT COLUMN -->
 
-    <!-- LEFT, ROW 2: What to fix (moved here) -->
-    <div id="adviceWrap" class="card" style="display:none">
-      <div style="font-weight:600;margin-bottom:6px">What to fix</div>
-      <ul id="adviceList" class="list"></ul>
-    </div>
-
-    <!-- RIGHT: Summary + remaining boxes -->
+    <!-- RIGHT COLUMN -->
     <div class="grid" style="gap:16px">
       <div id="summaryCard" class="card" style="border-color:#144f33">
         <div class="row">
@@ -187,7 +187,7 @@
         payout is $500. First five payouts have account-size caps. After 6th, no cap but you must still satisfy the minimum balance rules.
       </div>
     </div>
-    <!-- /RIGHT -->
+    <!-- /RIGHT COLUMN -->
   </div>
 </div>
 
@@ -350,7 +350,7 @@ const summary = {
 
 function getInputs(){
   const approvedCount = Math.max(0, Math.floor(n(fields.approvedCount.value)));
-  const payoutNumber = Math.max(1, approvedCount + 1); // computed attempt
+  const payoutNumber = Math.max(1, approvedCount + 1);
 
   return {
     paStatus: fields.paStatus.value,
@@ -367,7 +367,6 @@ function getInputs(){
 }
 
 function render(){
-  // Update helper text for payout status (informational only)
   const val = fields.payoutStatus.value;
   if(val==="none"){
     fields.payoutStatusHelp.textContent = "All trading days since starting this PA count toward payout eligibility.";
@@ -387,7 +386,7 @@ function render(){
   summary.safetyAmt.textContent = `$${fmt(res.computed.safetyNetAmount)}`;
   summary.minBal.textContent = `$${fmt(res.computed.minBalanceToRequest)}`;
   summary.minPay.textContent = `$${fmt(res.computed.minPayout)}`;
-  summary.maxCap.textContent = res.computed.maxPayoutCap ? `$${fmt(res.computed.maxPayoutCap)}` : "No cap (≥6th)";
+  summary.maxCap.textContent = res.computed.maxPayoutCap ? `$${fmt(res.computed.maxPayoutCap)}` : "No cap (≥6th)`;
 
   if (res.computed.payoutRangeAllowed){
     summary.rangeWrap.style.display = "block";
@@ -413,7 +412,7 @@ function render(){
     summary.checklist.appendChild(li);
   });
 
-  // Advice (now shows in the left column)
+  // Advice (now under inputs in the left column)
   summary.adviceList.innerHTML = "";
   if (res.advice.length){
     summary.adviceWrap.style.display = "block";
@@ -427,7 +426,6 @@ function render(){
   }
 }
 
-// re-evaluate on input
 Object.values(fields).forEach(el => el.addEventListener("input", render));
 render();
 
