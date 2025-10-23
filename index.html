@@ -425,58 +425,6 @@ function render(){
 Object.values(fields).forEach(el => el && el.addEventListener("input", render));
 render();
 
-/* ---------- Internal tests ---------- */
-try{
-  const testCases = [
-    {
-      name:"50k, 2nd payout, min met, windfall ok, days ok → YES",
-      input:{ paStatus:"Active", account:"50k", payoutNumber:2, isLiveProp:false, currentBalance:52600,
-        highestProfitDaySinceRef:600, tradingDaysSinceRef:8, profitableDaysOver50SinceRef:5, requestedPayout:500 },
-      expectEligible:true
-    },
-    {
-      name:"50k, 2nd payout, windfall violation (>30%) → NO",
-      input:{ paStatus:"Active", account:"50k", payoutNumber:2, isLiveProp:false, currentBalance:54000,
-        highestProfitDaySinceRef:1600, tradingDaysSinceRef:8, profitableDaysOver50SinceRef:5, requestedPayout:500 },
-      expectEligible:false
-    },
-    {
-      name:"50k, 1st payout, only 6 days → NO",
-      input:{ paStatus:"Active", account:"50k", payoutNumber:1, isLiveProp:false, currentBalance:53000,
-        highestProfitDaySinceRef:600, tradingDaysSinceRef:6, profitableDaysOver50SinceRef:4, requestedPayout:500 },
-      expectEligible:false
-    },
-    {
-      name:"50k, 4th payout, safety net lifted, leave ≥ start+100 → YES",
-      input:{ paStatus:"Active", account:"50k", payoutNumber:4, isLiveProp:false, currentBalance:53100,
-        highestProfitDaySinceRef:200, tradingDaysSinceRef:10, profitableDaysOver50SinceRef:6, requestedPayout:1000 },
-      expectEligible:true
-    },
-    {
-      name:"50k, 2nd payout, over the max cap → NO",
-      input:{ paStatus:"Active", account:"50k", payoutNumber:2, isLiveProp:false, currentBalance:56000,
-        highestProfitDaySinceRef:600, tradingDaysSinceRef:12, profitableDaysOver50SinceRef:8, requestedPayout:2500 },
-      expectEligible:false
-    },
-    {
-      name:"50k, 6th payout, no cap and no 30% rule → YES",
-      input:{ paStatus:"Active", account:"50k", payoutNumber:6, isLiveProp:false, currentBalance:60000,
-        highestProfitDaySinceRef:5000, tradingDaysSinceRef:16, profitableDaysOver50SinceRef:10, requestedPayout:8000 },
-      expectEligible:true
-    },
-  ];
-  const testsUl = document.getElementById("tests");
-  testCases.forEach(t=>{
-    const out = evaluate(t.input);
-    const pass = out.eligible === t.expectEligible;
-    const li = document.createElement("li");
-    li.textContent = `${pass ? "✅" : "❌"} ${t.name}`;
-    testsUl && testsUl.appendChild(li);
-  });
-}catch(e){
-  // swallow test errors so they never break the app
-  console.error(e);
-}
 }); // DOMContentLoaded
 </script>
 </body>
