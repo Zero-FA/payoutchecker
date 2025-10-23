@@ -72,11 +72,11 @@
           </select>
         </div>
 
-        <div>
-          <div class="label">Approved Payout Number</div>
-          <input id="payoutNumber" class="input" type="number" min="1" placeholder="e.g., 2" />
-          <div class="help">1st, 2nd, 3rd… (6th removes 30% rule and caps)</div>
-        </div>
+<div>
+  <div class="label">Approved Payouts So Far</div>
+  <input id="approvedCount" class="input" type="number" min="0" placeholder="e.g., 0" />
+  <div class="help">Enter how many payouts have already been <b>approved</b>. This request will be number (count + 1). The 6th removes the 30% rule and caps.</div>
+</div>
 
         <div class="row" style="padding-top:28px">
           <input id="isLiveProp" type="checkbox" />
@@ -316,7 +316,7 @@ function evaluate(inputs){
 const fields = {
   paStatus: $("#paStatus"),
   account: $("#account"),
-  payoutNumber: $("#payoutNumber"),
+approvedCount: $("#approvedCount"),
   isLiveProp: $("#isLiveProp"),
   currentBalance: $("#currentBalance"),
   requestedPayout: $("#requestedPayout"),
@@ -344,10 +344,14 @@ const summary = {
 };
 
 function getInputs(){
+  const approvedCount = Math.max(0, Math.floor(n(fields.approvedCount.value)));
+  // Current attempt number is "approved so far + 1"
+  const payoutNumber = Math.max(1, approvedCount + 1);
+
   return {
     paStatus: fields.paStatus.value,
     account: fields.account.value,
-    payoutNumber: Math.max(1, Math.floor(n(fields.payoutNumber.value))),
+    payoutNumber,                       // ← computed here
     isLiveProp: fields.isLiveProp.checked,
     currentBalance: n(fields.currentBalance.value),
     highestProfitDaySinceRef: n(fields.highestProfitDay.value),
