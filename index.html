@@ -369,7 +369,7 @@ function render(){
   if(val==="none"){
     fields.payoutStatusHelp.textContent = "All trading days since starting this PA count toward payout eligibility.";
   }else if(val==="denied"){
-    fields.payoutStatusHelp.textContent = "Count all trading days after the payout denial.";
+    fields.payoutStatusHelp.textContent = "For trading days since last request, count all trading days after the payout denial.";
   }else{
     fields.payoutStatusHelp.textContent = "If your last payout was approved, the 8-day count starts the day after that approval.";
   }
