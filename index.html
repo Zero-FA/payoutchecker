@@ -20,13 +20,10 @@
   .grid{display:grid;gap:12px}
   .cols2{grid-template-columns:1fr 1fr}
   .cols3{grid-template-columns:2fr 1fr}
-  .cols4{grid-template-columns:1fr 1fr}
   .label{font-size:12px;color:var(--muted);margin-bottom:6px}
   .input,.select{width:100%;border:1px solid #243143;background:#0b1527;color:var(--ink);
                  border-radius:10px;padding:10px 12px;font:inherit}
   .help{font-size:12px;color:var(--muted);margin-top:4px}
-  .pill{display:inline-block;border:1px solid #20433a;background:var(--pill);
-        border-radius:999px;padding:4px 10px;font-size:12px}
   .row{display:flex;gap:8px;align-items:center}
   .ok{color:var(--good)} .bad{color:var(--bad)}
   .tile{background:#0c162b;border:1px solid #1f2c46;border-radius:12px;padding:12px}
@@ -40,7 +37,7 @@
        padding:8px 10px;cursor:pointer}
   .btn:hover{background:#0c1528}
   hr{border:none;border-top:1px solid #1a2234;margin:12px 0}
-  @media (max-width:920px){ .cols3,.cols2,.cols4{grid-template-columns:1fr} }
+  @media (max-width:920px){ .cols3,.cols2{grid-template-columns:1fr} }
   svg{flex:0 0 auto}
 </style>
 </head>
@@ -111,6 +108,17 @@
         <div>
           <div class="label">Profitable Days ≥ $50</div>
           <input id="profitableDays" class="input" type="number" min="0" placeholder="e.g., 5" />
+        </div>
+
+        <!-- NEW FIELD: Last Payout Status -->
+        <div>
+          <div class="label">Last Payout Status</div>
+          <select id="payoutStatus" class="select">
+            <option value="none">None yet</option>
+            <option value="approved">Approved</option>
+            <option value="denied">Denied</option>
+          </select>
+          <div id="payoutStatusHelp" class="help">All trading days since starting this PA count toward payout eligibility.</div>
         </div>
       </div>
     </div>
@@ -315,6 +323,8 @@ const fields = {
   highestProfitDay: $("#highestProfitDay"),
   tradingDays: $("#tradingDays"),
   profitableDays: $("#profitableDays"),
+  payoutStatus: $("#payoutStatus"),
+  payoutStatusHelp: $("#payoutStatusHelp"),
 };
 
 const summary = {
@@ -349,6 +359,16 @@ function getInputs(){
 }
 
 function render(){
+  // Update helper text for payout status (informational only)
+  const val = fields.payoutStatus.value;
+  if(val==="none"){
+    fields.payoutStatusHelp.textContent = "All trading days since starting this PA count toward payout eligibility.";
+  }else if(val==="denied"){
+    fields.payoutStatusHelp.textContent = "Count all trading days since your most recent approved payout (or since start if never approved).";
+  }else{
+    fields.payoutStatusHelp.textContent = "If your last payout was approved, the 8-day count starts the day after that approval.";
+  }
+
   const res = evaluate(getInputs());
 
   summary.yesno.textContent = res.eligible ? "YES" : "NO";
