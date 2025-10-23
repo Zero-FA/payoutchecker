@@ -77,6 +77,17 @@
   <input id="approvedCount" class="input" type="number" min="0" placeholder="e.g., 0" />
   <div class="help">Enter how many payouts have already been <b>approved</b>. This request will be number (count + 1). The 6th removes the 30% rule and caps.</div>
 </div>
+        <div>
+          <div class="label">Last Payout Status</div>
+          <select id="payoutStatus" class="select">
+            <option value="none">None yet</option>
+            <option value="approved">Approved</option>
+            <option value="denied">Denied</option>
+          </select>
+          <div id="payoutStatusHelp" class="help">All trading days since starting this PA count toward payout eligibility.</div>
+        </div>
+      </div>
+    </div>
 
         <div class="row" style="padding-top:28px">
           <input id="isLiveProp" type="checkbox" />
@@ -109,19 +120,6 @@
           <div class="label">Profitable Days ≥ $50 Since Last Approval</div>
           <input id="profitableDays" class="input" type="number" min="0" placeholder="e.g., 5" />
         </div>
-
-        <!-- NEW FIELD: Last Payout Status -->
-        <div>
-          <div class="label">Last Payout Status</div>
-          <select id="payoutStatus" class="select">
-            <option value="none">None yet</option>
-            <option value="approved">Approved</option>
-            <option value="denied">Denied</option>
-          </select>
-          <div id="payoutStatusHelp" class="help">All trading days since starting this PA count toward payout eligibility.</div>
-        </div>
-      </div>
-    </div>
 
     <!-- RIGHT: Summary -->
     <div class="grid" style="gap:16px">
