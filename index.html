@@ -49,6 +49,7 @@
   <div class="grid cols3" style="gap:16px">
     <!-- LEFT: Inputs -->
     <div class="card">
+      <!-- Top section: account + history -->
       <div class="grid cols2">
         <div>
           <div class="label">PA Status</div>
@@ -72,11 +73,12 @@
           </select>
         </div>
 
-<div>
-  <div class="label">Approved Payouts So Far</div>
-  <input id="approvedCount" class="input" type="number" min="0" placeholder="e.g., 0" />
-  <div class="help">Enter how many payouts have already been <b>approved</b>. This request will be number (count + 1). The 6th removes the 30% rule and caps.</div>
-</div>
+        <div>
+          <div class="label">Approved Payouts So Far</div>
+          <input id="approvedCount" class="input" type="number" min="0" placeholder="e.g., 0" />
+          <div class="help">Enter how many payouts have already been <b>approved</b>. This request will be number (count + 1). The 6th removes the 30% rule and caps.</div>
+        </div>
+
         <div>
           <div class="label">Last Payout Status</div>
           <select id="payoutStatus" class="select">
@@ -95,6 +97,7 @@
 
       <hr />
 
+      <!-- Bottom section: balances + performance -->
       <div class="grid cols2">
         <div>
           <div class="label">Current Balance ($)</div>
@@ -118,6 +121,9 @@
           <div class="label">Profitable Days ≥ $50 Since Last Approval</div>
           <input id="profitableDays" class="input" type="number" min="0" placeholder="e.g., 5" />
         </div>
+      </div>
+    </div>
+    <!-- /LEFT card -->
 
     <!-- RIGHT: Summary -->
     <div class="grid" style="gap:16px">
@@ -178,6 +184,7 @@
         payout is $500. First five payouts have account-size caps. After 6th, no cap but you must still satisfy the minimum balance rules.
       </div>
     </div>
+    <!-- /RIGHT -->
   </div>
 </div>
 
@@ -201,7 +208,7 @@ const fmt = n => (n==null || Number.isNaN(n) ? "—" : Number(n).toLocaleString(
 const n = s => { const v = Number(String(s||"").replace(/[^0-9.-]/g,"")); return Number.isFinite(v)?v:0; };
 const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
 
-/* ---------- Core evaluation (same rules as the React version) ---------- */
+/* ---------- Core evaluation ---------- */
 function evaluate(inputs){
   const cfg = ACCOUNT_CONFIG[inputs.account];
   const payoutNum = clamp(Math.floor(inputs.payoutNumber||0),1,99);
@@ -209,7 +216,6 @@ function evaluate(inputs){
 
   const safetyNetRequired = !inputs.isLiveProp && payoutNum <= 3;
   const safetyNetAmount = cfg.minReqBalanceFirst3 - cfg.startBalance;
-
   const minBalanceToRequest = safetyNetRequired ? cfg.minReqBalanceFirst3 : cfg.startBalance + 100;
 
   const windfallRuleApplies = !inputs.isLiveProp && payoutNum < 6;
@@ -312,7 +318,7 @@ function evaluate(inputs){
 const fields = {
   paStatus: $("#paStatus"),
   account: $("#account"),
-approvedCount: $("#approvedCount"),
+  approvedCount: $("#approvedCount"),
   isLiveProp: $("#isLiveProp"),
   currentBalance: $("#currentBalance"),
   requestedPayout: $("#requestedPayout"),
@@ -341,20 +347,19 @@ const summary = {
 
 function getInputs(){
   const approvedCount = Math.max(0, Math.floor(n(fields.approvedCount.value)));
-  // Current attempt number is "approved so far + 1"
-  const payoutNumber = Math.max(1, approvedCount + 1);
+  const payoutNumber = Math.max(1, approvedCount + 1); // computed attempt
 
   return {
     paStatus: fields.paStatus.value,
     account: fields.account.value,
-    payoutNumber,                       // ← computed here
+    payoutNumber,
     isLiveProp: fields.isLiveProp.checked,
     currentBalance: n(fields.currentBalance.value),
     highestProfitDaySinceRef: n(fields.highestProfitDay.value),
     tradingDaysSinceRef: Math.max(0, Math.floor(n(fields.tradingDays.value))),
     profitableDaysOver50SinceRef: Math.max(0, Math.floor(n(fields.profitableDays.value))),
     requestedPayout: n(fields.requestedPayout.value),
-    // lastApprovedPayoutBalance: undefined   // (optional, not exposed in UI)
+    // lastApprovedPayoutBalance: undefined
   };
 }
 
@@ -423,7 +428,7 @@ function render(){
 Object.values(fields).forEach(el => el.addEventListener("input", render));
 render();
 
-/* ---------- Internal tests (same as TSX version) ---------- */
+/* ---------- Internal tests ---------- */
 const testCases = [
   {
     name:"50k, 2nd payout, min met, windfall ok, days ok → YES",
