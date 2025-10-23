@@ -116,7 +116,7 @@
             <input id="tradingDays" class="input" type="number" min="0" placeholder="e.g., 8" />
           </div>
           <div>
-            <div class="label">Profitable Days ≥ $50 Since Last Approval</div>
+            <div class="label">Profitable Days ≥ $50 Since Last Approval/Denial</div>
             <input id="profitableDays" class="input" type="number" min="0" placeholder="e.g., 5" />
           </div>
         </div>
@@ -367,7 +367,7 @@ function render(){
   if(val==="none"){
     fields.payoutStatusHelp.textContent = "All trading days since starting this PA count toward eligibility.";
   }else if(val==="denied"){
-    fields.payoutStatusHelp.textContent = "If your last payout was denied, the 8-day count starts the day after that denial.";
+    fields.payoutStatusHelp.textContent = "If your last payout was denied, the 8-day count and the 5-day ≥ $50 requirement start the day after that denial.";
   }else{
     fields.payoutStatusHelp.textContent = "If your last payout was approved, the 8-day count starts the day after that approval.";
   }
