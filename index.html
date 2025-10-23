@@ -8,7 +8,7 @@
 <style>
   :root{
     --bg:#0b1220; --card:#0f172a; --ink:#e5e7eb; --muted:#94a3b8; --line:#1f2937;
-    --good:#22c55e; --bad:#f43f5e;
+    --good:#22c55e; --good2:#16a34a; --bad:#f43f5e; --pill:#10b98133;
   }
   *{box-sizing:border-box}
   body{margin:0;background:linear-gradient(180deg,#0b1220,#0a0f1a 28%,#0b1220);
@@ -33,6 +33,9 @@
   .list li:last-child{border-bottom:0}
   .mono{font:12px ui-monospace,Consolas,Menlo,monospace}
   .tests{font-size:12px;color:var(--muted)}
+  .btn{border:1px solid #2a364a;background:#101a2e;color:var(--ink);border-radius:10px;
+       padding:8px 10px;cursor:pointer}
+  .btn:hover{background:#0c1528}
   hr{border:none;border-top:1px solid #1a2234;margin:12px 0}
   @media (max-width:920px){ .cols3,.cols2{grid-template-columns:1fr} }
   svg{flex:0 0 auto}
@@ -43,117 +46,94 @@
   <div class="h1">Apex PA Payout Checker</div>
   <div class="sub">Quickly validate payout eligibility per account and payout number.</div>
 
-  <!-- MAIN GRID -->
-  <div class="grid cols3" style="gap:16px;align-items:start">
+<div class="grid" style="gap:16px">
     <!-- LEFT: Inputs -->
-    <div>
-      <div class="card">
-        <div class="grid cols2">
-          <div>
-            <div class="label">PA Status</div>
-            <select id="paStatus" class="select">
-              <option>Active</option>
-              <option>Account Blown</option>
-              <option>Failed Rebill</option>
-              <option>User Cancelled</option>
-            </select>
-          </div>
-          <div>
-            <div class="label">Account Size</div>
-            <select id="account" class="select">
-              <option value="25k">$25k</option>
-              <option value="50k" selected>$50k</option>
-              <option value="100k">$100k</option>
-              <option value="150k">$150k</option>
-              <option value="250k">$250k</option>
-              <option value="300k">$300k</option>
-              <option value="100kStatic">$100k Static</option>
-            </select>
-          </div>
-
-          <div>
-            <div class="label">Approved Payouts So Far</div>
-            <input id="approvedCount" class="input" type="number" min="0" placeholder="e.g., 0" />
-            <div class="help">Enter how many payouts have already been <b>approved</b>. This request will be number (count + 1). The 6th removes the 30% rule and caps.</div>
-          </div>
-
-          <div>
-            <div class="label">Last Payout Status</div>
-            <select id="payoutStatus" class="select">
-              <option value="none">None yet</option>
-              <option value="approved">Approved</option>
-              <option value="denied">Denied</option>
-            </select>
-            <div id="payoutStatusHelp" class="help">All trading days since starting this PA count toward payout eligibility.</div>
-          </div>
-
-          <div class="row" style="padding-top:28px">
-            <input id="isLiveProp" type="checkbox" />
-            <label for="isLiveProp">Live Prop Account (lifts 30% rule)</label>
-          </div>
+    <div class="card">
+      <!-- Top section: account + history -->
+      <div class="grid cols2">
+        <div>
+          <div class="label">PA Status</div>
+          <select id="paStatus" class="select">
+            <option>Active</option>
+            <option>Account Blown</option>
+            <option>Failed Rebill</option>
+            <option>User Cancelled</option>
+          </select>
+        </div>
+        <div>
+          <div class="label">Account Size</div>
+          <select id="account" class="select">
+            <option value="25k">$25k</option>
+            <option value="50k" selected>$50k</option>
+            <option value="100k">$100k</option>
+            <option value="150k">$150k</option>
+            <option value="250k">$250k</option>
+            <option value="300k">$300k</option>
+            <option value="100kStatic">$100k Static</option>
+          </select>
         </div>
 
-        <hr />
+        <div>
+          <div class="label">Approved Payouts So Far</div>
+          <input id="approvedCount" class="input" type="number" min="0" placeholder="e.g., 0" />
+          <div class="help">Enter how many payouts have already been <b>approved</b>. The 4th no longer requires the safety net. The 6th removes the 30% rule and caps.</div>
+        </div>
 
-        <div class="grid cols2">
-          <div>
-            <div class="label">Current Balance ($)</div>
-            <input id="currentBalance" class="input" inputmode="decimal" placeholder="e.g., 52600" />
-          </div>
-          <div>
-            <div class="label">Desired Payout ($)</div>
-            <input id="requestedPayout" class="input" inputmode="decimal" placeholder="e.g., 500" />
-            <div class="help">Min $500. Caps apply for first 5 payouts.</div>
-          </div>
+        <div>
+          <div class="label">Last Payout Status</div>
+          <select id="payoutStatus" class="select">
+            <option value="none">None yet</option>
+            <option value="approved">Approved</option>
+            <option value="denied">Denied</option>
+          </select>
+          <div id="payoutStatusHelp" class="help">All trading days since starting this PA count toward payout eligibility.</div>
+        </div>
 
-          <div>
-            <div class="label">Highest Profit Day Since Last Approval</div>
-            <input id="highestProfitDay" class="input" inputmode="decimal" placeholder="e.g., 600" />
-          </div>
-          <div>
-            <div class="label">Trading Days Since Last Request</div>
-            <input id="tradingDays" class="input" type="number" min="0" placeholder="e.g., 8" />
-          </div>
-          <div>
-            <div class="label">Profitable Days ≥ $50 Since Last Approval</div>
-            <input id="profitableDays" class="input" type="number" min="0" placeholder="e.g., 5" />
-          </div>
+        <div class="row" style="padding-top:28px">
+          <input id="isLiveProp" type="checkbox" />
+          <label for="isLiveProp">Live Prop Account (lifts 30% rule)</label>
         </div>
       </div>
 
-      <!-- BELOW FORM -->
-      <div class="grid" style="gap:16px; margin-top:16px;">
-        <div class="card">
-          <div style="font-weight:600;margin-bottom:6px">Checklist</div>
-          <ul id="checklist" class="list"></ul>
+      <hr />
+
+      <!-- Bottom section: balances + performance -->
+      <div class="grid cols2">
+        <div>
+          <div class="label">Current Balance ($)</div>
+          <input id="currentBalance" class="input" inputmode="decimal" placeholder="e.g., 52600" />
+        </div>
+        <div>
+          <div class="label">Desired Payout ($)</div>
+          <input id="requestedPayout" class="input" inputmode="decimal" placeholder="e.g., 500" />
+          <div class="help">Min $500. Caps apply for first 5 payouts.</div>
         </div>
 
-        <div id="adviceWrap" class="card" style="display:none">
-          <div style="font-weight:600;margin-bottom:6px">What to fix</div>
-          <ul id="adviceList" class="list"></ul>
+        <div>
+          <div class="label">Highest Profit Day Since Last Approval</div>
+          <input id="highestProfitDay" class="input" inputmode="decimal" placeholder="e.g., 600" />
         </div>
-
-        <div class="card tests">
-          <div style="font-weight:600;margin-bottom:6px">Internal Tests</div>
-          <ul id="tests" class="list"></ul>
+        <div>
+          <div class="label">Trading Days Since Last Request</div>
+          <input id="tradingDays" class="input" type="number" min="0" placeholder="e.g., 8" />
         </div>
-
-        <div class="card tests mono">
-          Notes: 30% rule lifted on the 6th payout or Live Prop. Safety net (drawdown + $100) applies to first three payouts only. Min
-          payout is $500. First five payouts have account-size caps. After 6th, no cap but you must still satisfy the minimum balance rules.
+        <div>
+          <div class="label">Profitable Days ≥ $50 Since Last Approval</div>
+          <input id="profitableDays" class="input" type="number" min="0" placeholder="e.g., 5" />
         </div>
       </div>
     </div>
+    <!-- /LEFT card -->
 
     <!-- RIGHT: Summary -->
-    <div class="grid" style="gap:16px;align-self:start;">
+    <div class="grid" style="gap:16px">
       <div id="summaryCard" class="card" style="border-color:#144f33">
         <div class="row">
           <svg class="ok" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
             <path d="M22 4 12 14.01l-3-3"></path>
           </svg>
-          <div style="font-weight:700">Should user get a payout?</div>
+          <div style="font-weight:700">Should the payout be approved?</div>
         </div>
         <div id="yesno" style="font-size:22px;font-weight:800;margin:6px 0" class="ok">YES</div>
 
@@ -183,13 +163,318 @@
           <div id="range" style="font-weight:700;font-size:16px">$— – $—</div>
         </div>
       </div>
+
+      <div class="card">
+        <div style="font-weight:600;margin-bottom:6px">Checklist</div>
+        <ul id="checklist" class="list"></ul>
+      </div>
+
+      <div id="adviceWrap" class="card" style="display:none">
+        <div style="font-weight:600;margin-bottom:6px">What to fix</div>
+        <ul id="adviceList" class="list"></ul>
+      </div>
+
+      <div class="card tests">
+        <div style="font-weight:600;margin-bottom:6px">Internal Tests</div>
+        <ul id="tests" class="list"></ul>
+      </div>
+
+      <div class="card tests mono">
+        Notes: 30% rule lifted on the 6th payout or Live Prop. Safety net (drawdown + $100) applies to first three payouts only. Min
+        payout is $500. First five payouts have account-size caps. After 6th, no cap but you must still satisfy the minimum balance rules.
+      </div>
     </div>
+    <!-- /RIGHT -->
   </div>
 </div>
 
 <script>
-/* ---------- JS logic unchanged ---------- */
-/* (Omitted here for brevity — you can keep your same JS as before) */
+/* ---------- Data & Helpers ---------- */
+const ACCOUNT_CONFIG = {
+  "25k": { label:"$25k", startBalance:25000, minReqBalanceFirst3:26600 },
+  "50k": { label:"$50k", startBalance:50000, minReqBalanceFirst3:52600 },
+  "100k":{ label:"$100k", startBalance:100000, minReqBalanceFirst3:103100 },
+  "150k":{ label:"$150k", startBalance:150000, minReqBalanceFirst3:155100 },
+  "250k":{ label:"$250k", startBalance:250000, minReqBalanceFirst3:256600 },
+  "300k":{ label:"$300k", startBalance:300000, minReqBalanceFirst3:307600 },
+  "100kStatic":{ label:"$100k Static", startBalance:100000, minReqBalanceFirst3:102600 },
+};
+const MAX_PAYOUT_FIRST_FIVE = {
+  "25k":1500,"50k":2000,"100k":2500,"150k":2750,"250k":3000,"300k":3500,"100kStatic":1000
+};
+
+const $ = s => document.querySelector(s);
+const fmt = n => (n==null || Number.isNaN(n) ? "—" : Number(n).toLocaleString(undefined,{maximumFractionDigits:2}));
+const n = s => { const v = Number(String(s||"").replace(/[^0-9.-]/g,"")); return Number.isFinite(v)?v:0; };
+const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
+
+/* ---------- Core evaluation ---------- */
+function evaluate(inputs){
+  const cfg = ACCOUNT_CONFIG[inputs.account];
+  const payoutNum = clamp(Math.floor(inputs.payoutNumber||0),1,99);
+  const minPayout = 500;
+
+  const safetyNetRequired = !inputs.isLiveProp && payoutNum <= 3;
+  const safetyNetAmount = cfg.minReqBalanceFirst3 - cfg.startBalance;
+  const minBalanceToRequest = safetyNetRequired ? cfg.minReqBalanceFirst3 : cfg.startBalance + 100;
+
+  const windfallRuleApplies = !inputs.isLiveProp && payoutNum < 6;
+  const baseline = inputs.lastApprovedPayoutBalance ?? cfg.startBalance;
+  const totalProfit = Math.max(0, inputs.currentBalance - baseline);
+  const windfallPass = !windfallRuleApplies ? true : (totalProfit === 0 ? false : (inputs.highestProfitDaySinceRef / totalProfit) <= 0.3);
+
+  const eightDaysPass = inputs.tradingDaysSinceRef >= 8;
+  const fiveDays50Pass = inputs.profitableDaysOver50SinceRef >= 5;
+
+  const maxPayoutCap = payoutNum <= 5 ? (MAX_PAYOUT_FIRST_FIVE[inputs.account] ?? null) : null;
+
+  const meetsMinBalance = inputs.currentBalance >= minBalanceToRequest;
+  const canLeaveMinAfter = inputs.currentBalance - inputs.requestedPayout >= minBalanceToRequest;
+  const meetsMinRequest = inputs.requestedPayout >= minPayout;
+  const underMaxCap = (maxPayoutCap==null) ? true : inputs.requestedPayout <= maxPayoutCap;
+
+  let safetyNetEncroachmentOK = true;
+  if (safetyNetRequired){
+    const overage = Math.max(0, inputs.requestedPayout - minPayout);
+    const mustHave = cfg.minReqBalanceFirst3 + overage;
+    safetyNetEncroachmentOK =
+      inputs.requestedPayout === minPayout
+        ? inputs.currentBalance >= cfg.minReqBalanceFirst3
+        : inputs.currentBalance >= mustHave;
+  }
+
+  const paActive = inputs.paStatus === "Active";
+
+  const reasons = [
+    { pass: paActive, label: "Performance Account is active", detail: paActive ? "Account is in good standing." : `Status: ${inputs.paStatus}` },
+    { pass: eightDaysPass, label: "≥ 8 trading days since last APPROVED payout (or start)", detail: `You have ${inputs.tradingDaysSinceRef} day(s).` },
+    { pass: fiveDays50Pass, label: "≥ 5 days with ≥ $50 profit (in the same period)", detail: `You have ${inputs.profitableDaysOver50SinceRef} day(s).` },
+    {
+      pass: windfallPass,
+      label: windfallRuleApplies ? "30% consistency rule met (no single day > 30% of total profit)" : "30% rule not in effect (≥ 6th payout or Live Prop)",
+      detail: windfallRuleApplies ? `Highest day: $${fmt(inputs.highestProfitDaySinceRef)} | Total profit: $${fmt(totalProfit)} | Ratio: ${((inputs.highestProfitDaySinceRef/Math.max(1,totalProfit))*100).toFixed(1)}%` : undefined
+    },
+    {
+      pass: meetsMinBalance,
+      label: safetyNetRequired ? `Meets safety net balance (≥ $${fmt(minBalanceToRequest)})` : `Meets trailing DD stop balance (≥ $${fmt(minBalanceToRequest)})`,
+      detail: `Current balance: $${fmt(inputs.currentBalance)}`
+    },
+    { pass: meetsMinRequest, label: `Requested payout ≥ $${fmt(minPayout)}` },
+    { pass: underMaxCap, label: maxPayoutCap==null ? "No max payout cap (≥ 6th payout)" : `Under max payout cap for this account & payout # (≤ $${fmt(maxPayoutCap)})` },
+    {
+      pass: safetyNetRequired ? safetyNetEncroachmentOK : canLeaveMinAfter,
+      label: safetyNetRequired
+        ? (inputs.requestedPayout===minPayout ? "Min $500 allowed even if ending encroaches safety net by $500" : "Balance exceeds safety net by amount over $500 requested")
+        : "Sufficient balance remains after payout (≥ trailing stop)",
+      detail: safetyNetRequired
+        ? (inputs.requestedPayout===minPayout
+            ? `Need ≥ $${fmt(minBalanceToRequest)} before request. Ending can be as low as $${fmt(minBalanceToRequest - 500)}.`
+            : `For request of $${fmt(inputs.requestedPayout)}, need balance ≥ $${fmt(minBalanceToRequest + Math.max(0, inputs.requestedPayout - 500))}.`)
+        : `Post-payout balance would be $${fmt(inputs.currentBalance - inputs.requestedPayout)}. Must be ≥ $${fmt(minBalanceToRequest)}.`
+    },
+  ];
+
+  const eligible = reasons.every(r=>r.pass);
+  let payoutRangeAllowed = null;
+  if (eligible){
+    const minAllowed = 500;
+    let byBalance = safetyNetRequired ? Math.max(500, 500 + Math.max(0, inputs.currentBalance - minBalanceToRequest))
+                                      : inputs.currentBalance - minBalanceToRequest;
+    let maxAllowed = Math.floor(byBalance);
+    if (maxPayoutCap != null) maxAllowed = Math.min(maxAllowed, maxPayoutCap);
+    if (maxAllowed >= minAllowed) payoutRangeAllowed = { min:minAllowed, max:maxAllowed };
+  }
+
+  const advice = [];
+  if (!eightDaysPass) advice.push("Trade more days until you hit 8 since the last approved payout.");
+  if (!fiveDays50Pass) advice.push("You need at least 5 days with ≥ $50 profit in the same period.");
+  if (windfallRuleApplies && !reasons[3].pass){
+    advice.push(`Your highest day ($${fmt(inputs.highestProfitDaySinceRef)}) is >30% of total profit ($${fmt(totalProfit)}). Keep trading until total profit is at least $${fmt(Math.ceil(inputs.highestProfitDaySinceRef/0.3))}.`);
+  }
+  if (!reasons[4].pass){
+    advice.push(safetyNetRequired ? `Build balance to at least $${fmt(minBalanceToRequest)} to satisfy the safety net.` : `Build balance to at least $${fmt(minBalanceToRequest)} (trailing DD stop).`);
+  }
+  if (maxPayoutCap!=null && !reasons[6].pass){
+    advice.push(`Requested payout exceeds the max cap of $${fmt(maxPayoutCap)} for this payout number.`);
+  }
+
+  return {
+    eligible,
+    reasons,
+    advice,
+    computed:{
+      safetyNetRequired,
+      safetyNetAmount,
+      minBalanceToRequest,
+      minPayout,
+      maxPayoutCap: maxPayoutCap ?? null,
+      mustLeaveAfterPayout: minBalanceToRequest,
+      payoutRangeAllowed
+    }
+  };
+}
+
+/* ---------- Wire up UI ---------- */
+const fields = {
+  paStatus: $("#paStatus"),
+  account: $("#account"),
+  approvedCount: $("#approvedCount"),
+  isLiveProp: $("#isLiveProp"),
+  currentBalance: $("#currentBalance"),
+  requestedPayout: $("#requestedPayout"),
+  highestProfitDay: $("#highestProfitDay"),
+  tradingDays: $("#tradingDays"),
+  profitableDays: $("#profitableDays"),
+  payoutStatus: $("#payoutStatus"),
+  payoutStatusHelp: $("#payoutStatusHelp"),
+};
+
+const summary = {
+  yesno: $("#yesno"),
+  safetyReq: $("#safetyReq"),
+  safetyAmt: $("#safetyAmt"),
+  minBal: $("#minBal"),
+  minPay: $("#minPay"),
+  maxCap: $("#maxCap"),
+  rangeWrap: $("#rangeWrap"),
+  range: $("#range"),
+  card: $("#summaryCard"),
+  checklist: $("#checklist"),
+  adviceWrap: $("#adviceWrap"),
+  adviceList: $("#adviceList"),
+  tests: $("#tests"),
+};
+
+function getInputs(){
+  const approvedCount = Math.max(0, Math.floor(n(fields.approvedCount.value)));
+  const payoutNumber = Math.max(1, approvedCount + 1); // computed attempt
+
+  return {
+    paStatus: fields.paStatus.value,
+    account: fields.account.value,
+    payoutNumber,
+    isLiveProp: fields.isLiveProp.checked,
+    currentBalance: n(fields.currentBalance.value),
+    highestProfitDaySinceRef: n(fields.highestProfitDay.value),
+    tradingDaysSinceRef: Math.max(0, Math.floor(n(fields.tradingDays.value))),
+    profitableDaysOver50SinceRef: Math.max(0, Math.floor(n(fields.profitableDays.value))),
+    requestedPayout: n(fields.requestedPayout.value),
+    // lastApprovedPayoutBalance: undefined
+  };
+}
+
+function render(){
+  // Update helper text for payout status (informational only)
+  const val = fields.payoutStatus.value;
+  if(val==="none"){
+    fields.payoutStatusHelp.textContent = "All trading days since starting this PA count toward payout eligibility.";
+  }else if(val==="denied"){
+    fields.payoutStatusHelp.textContent = "If your last payout was denied, the 8-day count starts the day after that denial.";
+  }else{
+    fields.payoutStatusHelp.textContent = "If your last payout was approved, the 8-day count starts the day after that approval.";
+  }
+
+  const res = evaluate(getInputs());
+
+  summary.yesno.textContent = res.eligible ? "YES" : "NO";
+  summary.yesno.className = res.eligible ? "ok" : "bad";
+  summary.card.style.borderColor = res.eligible ? "#22c55e" : "#f43f5e";
+
+  summary.safetyReq.textContent = res.computed.safetyNetRequired ? "Yes (first 3)" : "No";
+  summary.safetyAmt.textContent = `$${fmt(res.computed.safetyNetAmount)}`;
+  summary.minBal.textContent = `$${fmt(res.computed.minBalanceToRequest)}`;
+  summary.minPay.textContent = `$${fmt(res.computed.minPayout)}`;
+  summary.maxCap.textContent = res.computed.maxPayoutCap ? `$${fmt(res.computed.maxPayoutCap)}` : "No cap (≥6th)";
+
+  if (res.computed.payoutRangeAllowed){
+    summary.rangeWrap.style.display = "block";
+    summary.range.textContent = `$${fmt(res.computed.payoutRangeAllowed.min)} – $${fmt(res.computed.payoutRangeAllowed.max)}`;
+  } else {
+    summary.rangeWrap.style.display = "none";
+  }
+
+  // Checklist
+  summary.checklist.innerHTML = "";
+  res.reasons.forEach(r=>{
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${r.pass?'#22c55e':'#f43f5e'}" stroke-width="2" style="margin-top:2px">
+        ${r.pass
+          ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><path d="M22 4 12 14.01l-3-3"></path>'
+          : '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>'}
+      </svg>
+      <div>
+        <div style="font-weight:600">${r.label}</div>
+        ${r.detail ? `<div class="help">${r.detail}</div>` : ""}
+      </div>`;
+    summary.checklist.appendChild(li);
+  });
+
+  // Advice
+  summary.adviceList.innerHTML = "";
+  if (res.advice.length){
+    summary.adviceWrap.style.display = "block";
+    res.advice.forEach(a=>{
+      const li = document.createElement("li");
+      li.innerHTML = `<div class="help">${a}</div>`;
+      summary.adviceList.appendChild(li);
+    });
+  } else {
+    summary.adviceWrap.style.display = "none";
+  }
+}
+
+// re-evaluate on input
+Object.values(fields).forEach(el => el.addEventListener("input", render));
+render();
+
+/* ---------- Internal tests ---------- */
+const testCases = [
+  {
+    name:"50k, 2nd payout, min met, windfall ok, days ok → YES",
+    input:{ paStatus:"Active", account:"50k", payoutNumber:2, isLiveProp:false, currentBalance:52600,
+      highestProfitDaySinceRef:600, tradingDaysSinceRef:8, profitableDaysOver50SinceRef:5, requestedPayout:500 },
+    expectEligible:true
+  },
+  {
+    name:"50k, 2nd payout, windfall violation (>30%) → NO",
+    input:{ paStatus:"Active", account:"50k", payoutNumber:2, isLiveProp:false, currentBalance:54000,
+      highestProfitDaySinceRef:1600, tradingDaysSinceRef:8, profitableDaysOver50SinceRef:5, requestedPayout:500 },
+    expectEligible:false
+  },
+  {
+    name:"50k, 1st payout, only 6 days → NO",
+    input:{ paStatus:"Active", account:"50k", payoutNumber:1, isLiveProp:false, currentBalance:53000,
+      highestProfitDaySinceRef:600, tradingDaysSinceRef:6, profitableDaysOver50SinceRef:4, requestedPayout:500 },
+    expectEligible:false
+  },
+  {
+    name:"50k, 4th payout, safety net lifted, leave ≥ start+100 → YES",
+    input:{ paStatus:"Active", account:"50k", payoutNumber:4, isLiveProp:false, currentBalance:53100,
+      highestProfitDaySinceRef:200, tradingDaysSinceRef:10, profitableDaysOver50SinceRef:6, requestedPayout:1000 },
+    expectEligible:true
+  },
+  {
+    name:"50k, 2nd payout, over the max cap → NO",
+    input:{ paStatus:"Active", account:"50k", payoutNumber:2, isLiveProp:false, currentBalance:56000,
+      highestProfitDaySinceRef:600, tradingDaysSinceRef:12, profitableDaysOver50SinceRef:8, requestedPayout:2500 },
+    expectEligible:false
+  },
+  {
+    name:"50k, 6th payout, no cap and no 30% rule → YES",
+    input:{ paStatus:"Active", account:"50k", payoutNumber:6, isLiveProp:false, currentBalance:60000,
+      highestProfitDaySinceRef:5000, tradingDaysSinceRef:16, profitableDaysOver50SinceRef:10, requestedPayout:8000 },
+    expectEligible:true
+  },
+];
+const testsUl = document.getElementById("tests");
+testCases.forEach(t=>{
+  const out = evaluate(t.input);
+  const pass = out.eligible === t.expectEligible;
+  const li = document.createElement("li");
+  li.textContent = `${pass ? "✅" : "❌"} ${t.name}`;
+  testsUl.appendChild(li);
+});
 </script>
 </body>
 </html>
