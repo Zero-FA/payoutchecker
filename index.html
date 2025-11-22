@@ -776,6 +776,34 @@ function render(){
 document.querySelectorAll("input, select").forEach(el =>
   el.addEventListener("input", render)
 );
+  // Auto-adjust Last Payout Status options based on Approved Payouts count
+fields.approvedCount.addEventListener("input", () => {
+  const approved = Number(fields.approvedCount.value || 0);
+  const payoutSelect = fields.payoutStatus;
+
+  const noneOption = payoutSelect.querySelector('option[value="none"]');
+
+  if (approved > 0) {
+    // Remove "None yet" if present
+    if (noneOption) noneOption.remove();
+
+    // If user had "none" selected, auto-switch to "approved"
+    if (payoutSelect.value === "none") {
+      payoutSelect.value = "approved";
+    }
+  } else {
+    // Restore "None yet" if missing
+    if (!noneOption) {
+      const opt = document.createElement("option");
+      opt.value = "none";
+      opt.textContent = "None yet";
+      payoutSelect.prepend(opt);
+    }
+    payoutSelect.value = "none";
+  }
+
+  render();
+});
 
 // checklist accordion toggle
 if (checklistToggle && checklistContent && checklistToggleIcon) {
