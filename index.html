@@ -148,11 +148,6 @@
               All trading days since starting this PA count toward eligibility.
             </div>
           </div>
-
-          <div class="row" style="padding-top:28px">
-            <input id="isLiveProp" type="checkbox" />
-            <label for="isLiveProp">Live Prop Account (lifts 30% rule)</label>
-          </div>
         </div>
 
         <hr />
@@ -349,11 +344,11 @@ function evaluate(inputs){
   const payoutNum = clamp(Math.floor(inputs.payoutNumber||0),1,99);
   const minPayout = 500;
 
-  const safetyNetRequired = !inputs.isLiveProp && payoutNum <= 3;
+  const safetyNetRequired = true && payoutNum <= 3;
   const safetyNetAmount = cfg.minReqBalanceFirst3 - cfg.startBalance;
   const minBalanceToRequest = safetyNetRequired ? cfg.minReqBalanceFirst3 : cfg.startBalance + 100;
 
-  const windfallRuleApplies = !inputs.isLiveProp && payoutNum < 6;
+  const windfallRuleApplies = true && payoutNum < 6;
   const baseline = cfg.startBalance; // could be replaced with last approved payout balance if tracked
   const totalProfit = Math.max(0, inputs.currentBalance - baseline);
   const windfallPass = !windfallRuleApplies
@@ -509,7 +504,6 @@ const fields = {
   paStatus: $("#paStatus"),
   account: $("#account"),
   approvedCount: $("#approvedCount"),
-  isLiveProp: $("#isLiveProp"),
   currentBalance: $("#currentBalance"),
   requestedPayout: $("#requestedPayout"),
   highestProfitDay: $("#highestProfitDay"),
@@ -546,7 +540,7 @@ function getInputs(){
     paStatus: fields.paStatus?.value || "Active",
     account: fields.account?.value || "50k",
     payoutNumber,
-    isLiveProp: !!fields.isLiveProp?.checked,
+isLiveProp: false,
     currentBalance: num(fields.currentBalance?.value),
     highestProfitDaySinceRef: num(fields.highestProfitDay?.value),
     tradingDaysSinceRef: Math.max(0, Math.floor(num(fields.tradingDays?.value))),
