@@ -217,13 +217,36 @@ const TRADING_RULES = [
 ];
 
 /* ---------- Build Rule Checkbox UI ---------- */
+// NEW Trading Rules With Links
 const rulesList = $("#rulesList");
+rulesList.innerHTML = "";
+
+const ruleLinks = {
+  scaling: "https://support.apextraderfunding.com/hc/en-us/articles/40463165052955-Contract-Scaling-Rule",
+  mae: "https://support.apextraderfunding.com/hc/en-us/articles/40463232267035-30-Negative-P-L-Rule-Maximum-Adverse-Excursion-MAE",
+  risk: "https://support.apextraderfunding.com/hc/en-us/articles/40463462503067-5-1-Risk-Reward-Ratio-Rule",
+  hedge: "https://support.apextraderfunding.com/hc/en-us/articles/40463541656603-Hedging-and-Correlated-Instruments-Rule",
+  direction: "https://support.apextraderfunding.com/hc/en-us/articles/40463473205275-One-Direction-Rule-Directionally-biased-trading"
+};
+
 TRADING_RULES.forEach(rule => {
   const li = document.createElement("li");
+  li.style.justifyContent = "space-between";
+  li.style.alignItems = "center";
+
   li.innerHTML = `
-    <input type="checkbox" id="rule_${rule.key}" data-rule="${rule.key}" />
-    <label for="rule_${rule.key}" style="cursor:pointer;font-weight:600">${rule.label}</label>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input type="checkbox" id="rule_${rule.key}" data-rule="${rule.key}" />
+      <label for="rule_${rule.key}" style="cursor:pointer;font-weight:600">${rule.label}</label>
+    </div>
+
+    <a href="${ruleLinks[rule.key]}"
+       target="_blank"
+       style="font-size:12px;color:#60a5fa;text-decoration:none;">
+       Learn more →
+    </a>
   `;
+
   rulesList.appendChild(li);
 });
 
