@@ -240,9 +240,31 @@
 
         <hr style="margin:14px 0 10px 0">
 
-        <!-- Checklist now inside the same card -->
-        <div style="font-weight:600;margin-bottom:6px">Checklist</div>
-        <ul id="checklist" class="list"></ul>
+        <!-- Checklist accordion -->
+        <div id="checklistAccordion" style="margin-top:4px;">
+          <button id="checklistToggle" type="button"
+                  style="
+                    width:100%;
+                    display:flex;
+                    align-items:center;
+                    justify-content:space-between;
+                    background:#020617;
+                    border:1px solid #1f2937;
+                    border-radius:10px;
+                    padding:8px 10px;
+                    color:#e5e7eb;
+                    font-size:13px;
+                    font-weight:600;
+                    cursor:pointer;
+                  ">
+            <span>Checklist</span>
+            <span id="checklistToggleIcon" style="font-size:12px;opacity:0.8;">▼</span>
+          </button>
+
+          <div id="checklistContent" style="margin-top:6px; display:none;">
+            <ul id="checklist" class="list"></ul>
+          </div>
+        </div>
       </div>
 
       <!-- Trading Rule Compliance With Checkboxes + Links -->
@@ -512,6 +534,10 @@ const summary = {
   adviceList: $("#adviceList"),
 };
 
+const checklistContent = document.getElementById("checklistContent");
+const checklistToggle = document.getElementById("checklistToggle");
+const checklistToggleIcon = document.getElementById("checklistToggleIcon");
+
 function getInputs(){
   const approvedCount = Math.max(0, Math.floor(num(fields.approvedCount?.value)));
   const payoutNumber = Math.max(1, (approvedCount || 0) + 1);
@@ -597,6 +623,15 @@ function render(){
 document.querySelectorAll("input, select").forEach(el =>
   el.addEventListener("input", render)
 );
+
+// checklist accordion toggle
+if (checklistToggle && checklistContent && checklistToggleIcon) {
+  checklistToggle.addEventListener("click", () => {
+    const isOpen = checklistContent.style.display === "block";
+    checklistContent.style.display = isOpen ? "none" : "block";
+    checklistToggleIcon.textContent = isOpen ? "▼" : "▲";
+  });
+}
 
 render();
 
