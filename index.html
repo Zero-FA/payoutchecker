@@ -47,7 +47,6 @@
   }
   .grid{display:grid;gap:12px}
   .cols2{grid-template-columns:1fr 1fr}
-  .cols3{grid-template-columns:1.4fr 1.1fr}
   .label{font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em}
   .input,.select{
     width:100%;
@@ -153,30 +152,6 @@
     transform:translateY(-1px);
   }
 
-  /* Accordion */
-  .accordion-toggle{
-    width:100%;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    background:#020617;
-    border:1px solid #111827;
-    border-radius:10px;
-    padding:7px 9px;
-    color:#e5e7eb;
-    font-size:12px;
-    font-weight:600;
-    cursor:pointer;
-  }
-  .accordion-toggle span.icon{
-    font-size:11px;
-    opacity:.8;
-  }
-  .accordion-body{
-    margin-top:5px;
-    display:none;
-  }
-
   /* Trading rules layout */
   .rules-grid{
     display:grid;
@@ -211,7 +186,7 @@
   }
 
   @media (max-width:920px){
-    .cols3,.cols2{grid-template-columns:1fr}
+    .cols2{grid-template-columns:1fr}
   }
 </style>
 </head>
@@ -236,12 +211,15 @@
     </div>
   </div>
 
-  <!-- MAIN GRID -->
-  <div class="grid cols3" style="gap:16px; align-items:start; margin-top:10px;">
+  <!-- MAIN GRID: 2x2 layout -->
+  <div class="grid cols2" style="gap:16px; align-items:start; margin-top:10px;">
 
-    <!-- LEFT (Form + What to Fix) -->
+    <!-- LEFT COLUMN (top: form + rules, bottom: checklist) -->
     <div class="grid" style="gap:12px">
+
+      <!-- Form + Trading Rules in SAME CARD -->
       <div class="card">
+        <!-- Form fields -->
         <div class="grid cols2" style="gap:10px 12px">
           <div>
             <div class="label">PA Status</div>
@@ -313,21 +291,37 @@
             <input id="profitableDays" class="input" type="number" min="0" placeholder="e.g., 5" />
           </div>
         </div>
+
+        <hr style="margin-top:12px;margin-bottom:8px;">
+
+        <!-- Trading Rule Compliance (inside same card) -->
+        <div class="row-between" style="margin-bottom:4px;">
+          <div style="font-weight:600;font-size:13px;">Trading Rule Compliance (Required)</div>
+          <div class="tag">
+            <span style="width:7px;height:7px;border-radius:999px;background:#22c55e;"></span>
+            Must be TRUE for payout
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">
+          Confirm you followed these rules during the payout period. If any were broken, address that with Support before requesting.
+        </div>
+        <ul id="rulesList" class="list rules-grid"></ul>
       </div>
 
-      <!-- What to Fix -->
-      <div id="adviceWrap" class="card-soft" style="display:none">
-        <div class="fix-badge">
-          <span style="width:8px;height:8px;border-radius:999px;background:#fecaca;"></span>
-          What you may need to fix before requesting
+      <!-- Eligibility Checklist (bottom-left) -->
+      <div class="card">
+        <div style="font-weight:600;font-size:13px;margin-bottom:4px;">Eligibility Checklist</div>
+        <div class="help" style="margin-bottom:4px;">
+          This updates automatically as you fill out the form and confirm trading rules.
         </div>
-        <ul id="adviceList" class="list"></ul>
+        <ul id="checklist" class="list"></ul>
       </div>
+
     </div>
 
-    <!-- RIGHT (Summary + Checklist + Trading Rules) -->
+    <!-- RIGHT COLUMN (top: summary, bottom: what to fix) -->
     <div class="grid" style="gap:12px">
-      <!-- Summary + Checklist merged -->
+      <!-- Summary -->
       <div id="summaryCard" class="card" style="border-color:#1d4ed8">
         <div class="row-between">
           <div class="row" style="gap:6px">
@@ -372,7 +366,7 @@
           <div class="tile">
             <div class="tile-label">Min balance to request</div>
             <div class="tile-main" id="minBal">—</div>
-            <div class="help">Must remain (≥4th) or be met before request (≤3rd).</div>
+            <div class="help">Must remain after payout (≥4th) or be met before request (≤3rd).</div>
           </div>
           <div class="tile">
             <div class="tile-label">Min payout</div>
@@ -390,37 +384,18 @@
           <div style="font-size:11px;margin-bottom:2px;">Estimated allowed payout range</div>
           <div id="range" style="font-weight:700;font-size:14px">$— – $—</div>
         </div>
-
-        <hr style="margin:10px 0 8px 0">
-
-        <!-- Checklist accordion -->
-        <div id="checklistAccordion" style="margin-top:2px;">
-          <button id="checklistToggle" type="button" class="accordion-toggle">
-            <span>Eligibility Checklist</span>
-            <span id="checklistToggleIcon" class="icon">▼</span>
-          </button>
-
-          <div id="checklistContent" class="accordion-body">
-            <ul id="checklist" class="list" style="margin-top:4px;"></ul>
-          </div>
-        </div>
       </div>
 
-      <!-- Trading Rule Compliance -->
-      <div class="card">
-        <div class="row-between" style="margin-bottom:4px;">
-          <div style="font-weight:600;font-size:13px;">Trading Rule Compliance (Required)</div>
-          <div class="tag">
-            <span style="width:7px;height:7px;border-radius:999px;background:#22c55e;"></span>
-            Must be TRUE for payout
-          </div>
+      <!-- What to Fix (bottom-right) -->
+      <div id="adviceWrap" class="card-soft" style="display:none">
+        <div class="fix-badge">
+          <span style="width:8px;height:8px;border-radius:999px;background:#fecaca;"></span>
+          What you may need to fix before requesting
         </div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">
-          Confirm you followed these rules during the payout period. If any were broken, address that with Support before requesting.
-        </div>
-        <ul id="rulesList" class="list rules-grid"></ul>
+        <ul id="adviceList" class="list"></ul>
       </div>
 
+      <!-- Notes -->
       <div class="card mono" style="font-size:11px;color:var(--muted)">
         Notes: 30% rule is lifted on the 6th payout. Safety net (drawdown + $100) applies to first three payouts only.
         Min payout is $500. First five payouts have account-size caps. After 6th, no cap but you must still satisfy the
@@ -681,10 +656,6 @@ const summary = {
   adviceList: $("#adviceList"),
 };
 
-const checklistContent = document.getElementById("checklistContent");
-const checklistToggle = document.getElementById("checklistToggle");
-const checklistToggleIcon = document.getElementById("checklistToggleIcon");
-
 function getInputs(){
   const approvedCount = Math.max(0, Math.floor(num(fields.approvedCount?.value)));
   const payoutNumber = Math.max(1, (approvedCount || 0) + 1);
@@ -776,7 +747,8 @@ function render(){
 document.querySelectorAll("input, select").forEach(el =>
   el.addEventListener("input", render)
 );
-  // Auto-adjust Last Payout Status options based on Approved Payouts count
+
+// Auto-adjust Last Payout Status options based on Approved Payouts count
 fields.approvedCount.addEventListener("input", () => {
   const approved = Number(fields.approvedCount.value || 0);
   const payoutSelect = fields.payoutStatus;
@@ -804,15 +776,6 @@ fields.approvedCount.addEventListener("input", () => {
 
   render();
 });
-
-// checklist accordion toggle
-if (checklistToggle && checklistContent && checklistToggleIcon) {
-  checklistToggle.addEventListener("click", () => {
-    const isOpen = checklistContent.style.display === "block";
-    checklistContent.style.display = isOpen ? "none" : "block";
-    checklistToggleIcon.textContent = isOpen ? "▼" : "▲";
-  });
-}
 
 render();
 
