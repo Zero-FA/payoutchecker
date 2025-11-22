@@ -308,16 +308,24 @@
         <ul id="rulesList" class="list rules-grid"></ul>
       </div>
 
-      <!-- Eligibility Checklist (bottom-left) -->
-      <div class="card">
-        <div style="font-weight:600;font-size:13px;margin-bottom:4px;">Eligibility Checklist</div>
-        <div class="help" style="margin-bottom:4px;">
-          This updates automatically as you fill out the form and confirm trading rules.
-        </div>
-        <ul id="checklist" class="list"></ul>
-      </div>
+<!-- Eligibility Checklist (bottom-left) -->
+<div class="card" id="eligibilityCard">
 
+  <!-- Accordion Toggle -->
+  <button id="eligibilityToggle" type="button" class="accordion-toggle">
+    <span>Eligibility Checklist</span>
+    <span id="eligibilityToggleIcon" class="icon">▼</span>
+  </button>
+
+  <!-- Accordion Content -->
+  <div id="eligibilityContent" class="accordion-body" style="margin-top:6px; display:none;">
+    <div class="help" style="margin-bottom:4px;">
+      This updates automatically as you fill out the form and confirm trading rules.
     </div>
+    <ul id="checklist" class="list"></ul>
+  </div>
+
+</div>
 
     <!-- RIGHT COLUMN (top: summary, bottom: what to fix) -->
     <div class="grid" style="gap:12px">
