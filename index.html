@@ -185,6 +185,28 @@
     margin-bottom:6px;
   }
 
+  /* Accordion (for Eligibility Checklist) */
+  .accordion-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    cursor:pointer;
+    padding:4px 0 2px 0;
+  }
+  .accordion-title{
+    font-weight:600;
+    font-size:13px;
+  }
+  .accordion-icon{
+    font-size:12px;
+    color:var(--muted);
+    margin-left:6px;
+  }
+  .accordion-body{
+    margin-top:6px;
+    display:none; /* collapsed by default */
+  }
+
   @media (max-width:920px){
     .cols2{grid-template-columns:1fr}
   }
@@ -308,24 +330,24 @@
         <ul id="rulesList" class="list rules-grid"></ul>
       </div>
 
-<!-- Eligibility Checklist (bottom-left) -->
-<div class="card" id="eligibilityCard">
+      <!-- Eligibility Checklist (accordion, bottom-left) -->
+      <div class="card">
+        <div id="checklistHeader" class="accordion-header">
+          <div class="accordion-title">Eligibility Checklist</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="help" style="margin-top:0;font-size:10px;">Click to expand</span>
+            <span id="checklistIcon" class="accordion-icon">▶</span>
+          </div>
+        </div>
+        <div class="help" style="margin-top:4px;margin-bottom:2px;">
+          This updates automatically as you fill out the form and confirm trading rules.
+        </div>
+        <div id="checklistBody" class="accordion-body">
+          <ul id="checklist" class="list" style="margin-top:4px;"></ul>
+        </div>
+      </div>
 
-  <!-- Accordion Toggle -->
-  <button id="eligibilityToggle" type="button" class="accordion-toggle">
-    <span>Eligibility Checklist</span>
-    <span id="eligibilityToggleIcon" class="icon">▼</span>
-  </button>
-
-  <!-- Accordion Content -->
-  <div id="eligibilityContent" class="accordion-body" style="margin-top:6px; display:none;">
-    <div class="help" style="margin-bottom:4px;">
-      This updates automatically as you fill out the form and confirm trading rules.
     </div>
-    <ul id="checklist" class="list"></ul>
-  </div>
-
-</div>
 
     <!-- RIGHT COLUMN (top: summary, bottom: what to fix) -->
     <div class="grid" style="gap:12px">
@@ -479,13 +501,13 @@ function evaluate(inputs){
   const payoutNum = clamp(Math.floor(inputs.payoutNumber||0),1,99);
   const minPayout = 500;
 
-  // Live Prop removed: always standard PA logic
+  // Standard PA logic
   const safetyNetRequired = payoutNum <= 3;
   const safetyNetAmount = cfg.minReqBalanceFirst3 - cfg.startBalance;
   const minBalanceToRequest = safetyNetRequired ? cfg.minReqBalanceFirst3 : cfg.startBalance + 100;
 
   const windfallRuleApplies = payoutNum < 6;
-  const baseline = cfg.startBalance; // if you later track last-approved-balance, swap it here
+  const baseline = cfg.startBalance;
   const totalProfit = Math.max(0, inputs.currentBalance - baseline);
   const windfallPass = !windfallRuleApplies
     ? true
@@ -664,6 +686,10 @@ const summary = {
   adviceList: $("#adviceList"),
 };
 
+const checklistHeader = document.getElementById("checklistHeader");
+const checklistBody = document.getElementById("checklistBody");
+const checklistIcon = document.getElementById("checklistIcon");
+
 function getInputs(){
   const approvedCount = Math.max(0, Math.floor(num(fields.approvedCount?.value)));
   const payoutNumber = Math.max(1, (approvedCount || 0) + 1);
@@ -764,15 +790,11 @@ fields.approvedCount.addEventListener("input", () => {
   const noneOption = payoutSelect.querySelector('option[value="none"]');
 
   if (approved > 0) {
-    // Remove "None yet" if present
     if (noneOption) noneOption.remove();
-
-    // If user had "none" selected, auto-switch to "approved"
     if (payoutSelect.value === "none") {
       payoutSelect.value = "approved";
     }
   } else {
-    // Restore "None yet" if missing
     if (!noneOption) {
       const opt = document.createElement("option");
       opt.value = "none";
@@ -784,6 +806,15 @@ fields.approvedCount.addEventListener("input", () => {
 
   render();
 });
+
+// Accordion toggle for Eligibility Checklist
+if (checklistHeader && checklistBody && checklistIcon) {
+  checklistHeader.addEventListener("click", () => {
+    const isOpen = checklistBody.style.display === "block";
+    checklistBody.style.display = isOpen ? "none" : "block";
+    checklistIcon.textContent = isOpen ? "▶" : "▼";
+  });
+}
 
 render();
 
