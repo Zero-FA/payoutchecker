@@ -11,29 +11,65 @@
     --good:#22c55e; --good2:#16a34a; --bad:#f43f5e; --pill:#10b98133;
   }
   *{box-sizing:border-box}
-  body{margin:0;background:linear-gradient(180deg,#0b1220,#0a0f1a 28%,#0b1220);
-       color:var(--ink);font:14px/1.5 system-ui,Segoe UI,Roboto,Helvetica,Arial}
+  body{
+    margin:0;
+    background:linear-gradient(180deg,#0b1220,#0a0f1a 28%,#0b1220);
+    color:var(--ink);
+    font:14px/1.5 system-ui,Segoe UI,Roboto,Helvetica,Arial
+  }
   .wrap{max-width:1100px;margin:32px auto;padding:0 16px}
   .h1{font-weight:800;font-size:24px;margin-bottom:4px}
-  .sub{color:var(--muted);margin-bottom:16px}
-  .card{background:rgba(15,23,42,.95);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .sub{color:var(--muted);margin-bottom:4px}
+  .card{
+    background:rgba(15,23,42,.95);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:16px
+  }
   .grid{display:grid;gap:12px}
   .cols2{grid-template-columns:1fr 1fr}
   .cols3{grid-template-columns:2fr 1fr}
   .label{font-size:12px;color:var(--muted);margin-bottom:6px}
-  .input,.select{width:100%;border:1px solid #243143;background:#0b1527;color:var(--ink);
-                 border-radius:10px;padding:10px 12px;font:inherit}
+  .input,.select{
+    width:100%;
+    border:1px solid #243143;
+    background:#0b1527;
+    color:var(--ink);
+    border-radius:10px;
+    padding:10px 12px;
+    font:inherit
+  }
   .help{font-size:12px;color:var(--muted);margin-top:4px}
   .row{display:flex;gap:8px;align-items:center}
-  .ok{color:var(--good)} .bad{color:var(--bad)}
-  .tile{background:#0c162b;border:1px solid #1f2c46;border-radius:12px;padding:12px}
-  .range{background:#06331f;border:1px solid #144f33;color:#a7f3d0;border-radius:12px;padding:12px}
+  .ok{color:var(--good)}
+  .bad{color:var(--bad)}
+  .tile{
+    background:#0c162b;
+    border:1px solid #1f2c46;
+    border-radius:12px;
+    padding:12px
+  }
+  .range{
+    background:#06331f;
+    border:1px solid #144f33;
+    color:#a7f3d0;
+    border-radius:12px;
+    padding:12px
+  }
   .list{list-style:none;padding:0;margin:0}
-  .list li{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid #142036}
+  .list li{
+    display:flex;
+    gap:8px;
+    align-items:flex-start;
+    padding:6px 0;
+    border-bottom:1px solid #142036
+  }
   .list li:last-child{border-bottom:0}
   .mono{font:12px ui-monospace,Consolas,Menlo,monospace}
   hr{border:none;border-top:1px solid #1a2234;margin:12px 0}
-  @media (max-width:920px){ .cols3,.cols2{grid-template-columns:1fr} }
+  @media (max-width:920px){
+    .cols3,.cols2{grid-template-columns:1fr}
+  }
   svg{flex:0 0 auto}
 </style>
 </head>
@@ -41,9 +77,9 @@
 <div class="wrap">
   <div class="h1">Zero's Apex Trader Funding Payout Checker</div>
   <div class="sub">Check your payout eligibility criteria.</div>
-  <div style="color:#64748b;font-size:12px;margin-top:-6px;margin-bottom:12px;">
-  This tool is unofficial and for guidance only; final decisions are made by Apex Trader Funding.
-</div>
+  <div style="color:#64748b;font-size:12px;margin-top:-2px;margin-bottom:10px;">
+    This tool is unofficial and for guidance only; final decisions are made by Apex Trader Funding.
+  </div>
 
   <div style="margin:8px 0 12px 0; text-align:right;">
     <a href="https://apextraderfunding.com/member/aff/go/seanodonoghue67"
@@ -156,6 +192,7 @@
 
     <!-- RIGHT (Summary + Checklist + Trading Rules) -->
     <div class="grid" style="gap:16px">
+      <!-- Summary + Checklist merged into one tall card -->
       <div id="summaryCard" class="card" style="border-color:#144f33">
         <div class="row">
           <svg class="ok" width="22" height="22" viewBox="0 0 24 24" fill="none"
@@ -172,6 +209,7 @@
              View Payout Parameters →
           </a>
         </div>
+
         <div id="yesno" style="font-size:22px;font-weight:800;margin:6px 0" class="ok">YES</div>
 
         <div class="grid cols2">
@@ -199,10 +237,10 @@
           <div class="help">Allowed payout range</div>
           <div id="range" style="font-weight:700;font-size:16px">$— – $—</div>
         </div>
-      </div>
 
-      <!-- Checklist -->
-      <div class="card">
+        <hr style="margin:14px 0 10px 0">
+
+        <!-- Checklist now inside the same card -->
         <div style="font-weight:600;margin-bottom:6px">Checklist</div>
         <ul id="checklist" class="list"></ul>
       </div>
@@ -214,7 +252,8 @@
       </div>
 
       <div class="card mono" style="font-size:12px;color:var(--muted)">
-        Notes: Trading rules MUST be followed to qualify for payout. This tool is an estimator only and does not guarantee approval.
+        Notes: Trading rules MUST be followed to qualify for payout.
+        This tool is an estimator only and does not guarantee approval.
       </div>
     </div>
 
@@ -282,7 +321,7 @@ TRADING_RULES.forEach(rule => {
   rulesList.appendChild(li);
 });
 
-/* ---------- Core evaluation (restored full logic + trading rules) ---------- */
+/* ---------- Core evaluation (full logic + trading rules) ---------- */
 function evaluate(inputs){
   const cfg = ACCOUNT_CONFIG[inputs.account];
   const payoutNum = clamp(Math.floor(inputs.payoutNumber||0),1,99);
@@ -293,7 +332,7 @@ function evaluate(inputs){
   const minBalanceToRequest = safetyNetRequired ? cfg.minReqBalanceFirst3 : cfg.startBalance + 100;
 
   const windfallRuleApplies = !inputs.isLiveProp && payoutNum < 6;
-  const baseline = cfg.startBalance; // could be last approved balance in future
+  const baseline = cfg.startBalance; // could be replaced with last approved payout balance if tracked
   const totalProfit = Math.max(0, inputs.currentBalance - baseline);
   const windfallPass = !windfallRuleApplies
     ? true
@@ -398,11 +437,9 @@ function evaluate(inputs){
   }
 
   // Trading rules (checkboxes) are REQUIRED
-  const ruleChecks = {};
   TRADING_RULES.forEach(rule => {
     const box = document.querySelector(`#rule_${rule.key}`);
     const checked = !!(box && box.checked);
-    ruleChecks[rule.key] = checked;
     reasons.push({
       pass: checked,
       label: rule.label,
@@ -441,8 +478,7 @@ function evaluate(inputs){
       maxPayoutCap: maxPayoutCap ?? null,
       mustLeaveAfterPayout: minBalanceToRequest,
       payoutRangeAllowed
-    },
-    ruleChecks
+    }
   };
 }
 
@@ -566,5 +602,6 @@ render();
 
 }); // DOMContentLoaded
 </script>
+
 </body>
 </html>
