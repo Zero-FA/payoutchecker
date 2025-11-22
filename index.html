@@ -129,7 +129,7 @@
       </div>
     </div>
 
-    <!-- RIGHT (summary + checklist + tests + notes) -->
+    <!-- RIGHT (summary + checklist + rules + tests) -->
     <div class="grid" style="gap:16px">
       <div id="summaryCard" class="card" style="border-color:#144f33">
         <div class="row">
@@ -171,6 +171,12 @@
       <div class="card">
         <div style="font-weight:600;margin-bottom:6px">Checklist</div>
         <ul id="checklist" class="list"></ul>
+      </div>
+
+      <!-- NEW Trading Rule Compliance Card -->
+      <div class="card">
+        <div style="font-weight:600;margin-bottom:6px">Trading Rule Compliance (Self-Check)</div>
+        <ul id="rulesList" class="list"></ul>
       </div>
 
       <div class="card tests mono">
@@ -254,7 +260,7 @@ function evaluate(inputs){
       detail: `Current balance: $${fmt(inputs.currentBalance)}`
     },
     { pass: meetsMinRequest, label: `Requested payout ≥ $${fmt(minPayout)}` },
-    { pass: underMaxCap, label: maxPayoutCap==null ? "No max payout cap (≥ 6th payout)" : `Under max payout cap for this account & payout # (≤ $${fmt(maxPayoutCap)})` },
+    { pass: underMaxCap, label: maxPayoutCap==null ? "No max payout cap (≥ 6th payout)" : `Under max payout cap for this payout number (≤ $${fmt(maxPayoutCap)})` },
     {
       pass: safetyNetRequired ? safetyNetEncroachmentOK : canLeaveMinAfter,
       label: safetyNetRequired
@@ -336,7 +342,6 @@ const summary = {
   checklist: $("#checklist"),
   adviceWrap: $("#adviceWrap"),
   adviceList: $("#adviceList"),
-  tests: $("#tests"),
 };
 
 function getInputs(){
@@ -414,6 +419,48 @@ function render(){
   } else {
     summary.adviceWrap.style.display = "none";
   }
+
+  // NEW Trading Rules Self-Check
+  const tradingRules = [
+    {
+      label: "Contract Scaling Rule",
+      detail: "Did you stay within half contracts until crossing the trailing threshold, and close excess size immediately if violated?"
+    },
+    {
+      label: "30% Negative P&L Rule (MAE)",
+      detail: "Did any trade exceed 30% negative open P&L based on start-of-day profit?"
+    },
+    {
+      label: "5:1 Risk-Reward Ratio Rule",
+      detail: "Were all trades taken with a stop no more than 5× the profit target?"
+    },
+    {
+      label: "Hedging Rule",
+      detail: "Did you avoid holding long and short positions at the same time on correlated instruments?"
+    },
+    {
+      label: "One Direction Rule",
+      detail: "Did you avoid placing orders that could make you long AND short simultaneously?"
+    }
+  ];
+
+  const rulesList = document.querySelector("#rulesList");
+  rulesList.innerHTML = "";
+
+  tradingRules.forEach(rule => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <svg width="18" height="18" viewBox="0 0 24 24" stroke="#94a3b8" stroke-width="2" fill="none" style="margin-top:2px">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="8" y1="12" x2="16" y2="12"></line>
+      </svg>
+      <div>
+        <div style="font-weight:600">${rule.label}</div>
+        <div class="help">${rule.detail}</div>
+      </div>
+    `;
+    rulesList.appendChild(li);
+  });
 }
 
 // input listeners
