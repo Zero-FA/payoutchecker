@@ -269,6 +269,10 @@
   border-color: #22c55e !important; /* your green tone */
   box-shadow: 0 0 8px rgba(34, 197, 94, .55);
 }
+ .select.required-unselected {
+  border-color: #facc15 !important; /* yellow-400 */
+  box-shadow: 0 0 8px rgba(250, 204, 21, .55);
+}
  /* =======================
    CHECKBOX COMPLETION STATES
    ======================= */
@@ -280,6 +284,7 @@
 .checkbox-required-filled {
   filter: drop-shadow(0 0 6px rgba(34, 197, 94, .65)); /* green */
 }
+
 </style>
 </head>
 <body>
@@ -802,13 +807,14 @@ const requiredInputs = [
     "rule_direction"
   ];
 
-// Text inputs
+// Text inputs (all must be filled; "0" counts as filled)
 requiredInputs.forEach(id => {
   const el = document.getElementById(id);
   if (!el) return;
 
-  let hasValue = el.value.trim() !== ""; 
-  // Empty = red, "0" = green, any number = green
+  // A field is VALID (green) as long as it is NOT empty
+  // So: "" = red, "0" = green, "123" = green
+  let hasValue = el.value.trim() !== "";
 
   el.classList.toggle("required-empty", !hasValue);
   el.classList.toggle("required-filled", hasValue);
