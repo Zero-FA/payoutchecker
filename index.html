@@ -779,13 +779,14 @@ function getInputs(){
   };
 }
 function updateInputGlow() {
-  const requiredInputs = [
-    "currentBalance",
-    "requestedPayout",
-    "highestProfitDay",
-    "tradingDays",
-    "profitableDays"
-  ];
+const requiredInputs = [
+  "approvedCount",
+  "currentBalance",
+  "requestedPayout",
+  "highestProfitDay",
+  "tradingDays",
+  "profitableDays"
+];
 
   const requiredDropdowns = [
     "paStatus",
@@ -801,15 +802,17 @@ function updateInputGlow() {
     "rule_direction"
   ];
 
-  // Text inputs
-  requiredInputs.forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
+// Text inputs
+requiredInputs.forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
 
-    const hasValue = el.value.trim() !== "" && el.value.trim() !== "0";
-    el.classList.toggle("required-empty", !hasValue);
-    el.classList.toggle("required-filled", hasValue);
-  });
+  let hasValue = el.value.trim() !== ""; 
+  // Empty = red, "0" = green, any number = green
+
+  el.classList.toggle("required-empty", !hasValue);
+  el.classList.toggle("required-filled", hasValue);
+});
 
   // Dropdowns
   requiredDropdowns.forEach(id => {
