@@ -254,6 +254,21 @@
   @media (max-width:920px){
     .cols2{grid-template-columns:1fr}
   }
+ /* =======================
+   INPUT COMPLETION STATES
+   ======================= */
+
+.input.required-empty,
+.select.required-empty {
+  border-color: #fb7185 !important; /* your red tone */
+  box-shadow: 0 0 8px rgba(251, 113, 133, .55);
+}
+
+.input.required-filled,
+.select.required-filled {
+  border-color: #22c55e !important; /* your green tone */
+  box-shadow: 0 0 8px rgba(34, 197, 94, .55);
+}
 </style>
 </head>
 <body>
@@ -752,6 +767,25 @@ function getInputs(){
     requestedPayout: num(fields.requestedPayout?.value),
   };
 }
+ function updateInputGlow() {
+  const requiredFields = [
+    "currentBalance",
+    "requestedPayout",
+    "highestProfitDay",
+    "tradingDays",
+    "profitableDays"
+  ];
+
+  requiredFields.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    const hasValue = el.value.trim() !== "" && el.value.trim() !== "0";
+
+    el.classList.toggle("required-empty", !hasValue);
+    el.classList.toggle("required-filled", hasValue);
+  });
+}
 
 function render(){
   // update helper text for last payout status
@@ -826,7 +860,10 @@ function render(){
 
 // input listeners (including rule checkboxes)
 document.querySelectorAll("input, select").forEach(el =>
-  el.addEventListener("input", render)
+  el.addEventListener("input", () => {
+    updateInputGlow();
+    render();
+  })
 );
 
 // Auto-adjust Last Payout Status options based on Approved Payouts count
@@ -863,6 +900,7 @@ if (checklistHeader && checklistBody && checklistIcon) {
   });
 }
 
+updateInputGlow();
 render();
 
 }); // DOMContentLoaded
