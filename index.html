@@ -828,9 +828,6 @@ requiredDropdowns.forEach(id => {
   const el = document.getElementById(id);
   if (!el) return;
 
-  // Skip normal glow logic for payoutStatus (handled below)
-  if (id === "payoutStatus") return;
-
   const hasValue = el.value.trim() !== "";
   el.classList.toggle("required-empty", !hasValue);
   el.classList.toggle("required-filled", hasValue);
