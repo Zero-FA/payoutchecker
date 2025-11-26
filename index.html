@@ -809,12 +809,18 @@ requiredDropdowns.forEach(id => {
   // SPECIAL CASE:
   // If approvedCount == 0 AND payoutStatus == "none"
   // → treat as filled (green)
-  if (id === "payoutStatus") {
-    const approved = Number(fields.approvedCount.value || 0);
-    if (approved === 0 && el.value === "none") {
-      hasValue = true;
-    }
+if (id === "payoutStatus") {
+  const approvedRaw = fields.approvedCount.value.trim();
+
+  // If approvedCount is EMPTY → force dropdown to be RED
+  if (approvedRaw === "") {
+    hasValue = false;
   }
+  // If approvedCount is exactly "0" AND payoutStatus is "none" → GREEN
+  else if (approvedRaw === "0" && el.value === "none") {
+    hasValue = true;
+  }
+}
 
   el.classList.toggle("required-empty", !hasValue);
   el.classList.toggle("required-filled", hasValue);
