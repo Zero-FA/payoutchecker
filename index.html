@@ -820,15 +820,34 @@ requiredInputs.forEach(id => {
   el.classList.toggle("required-filled", hasValue);
 });
 
-  // Dropdowns
-  requiredDropdowns.forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
+// Dropdowns
+requiredDropdowns.forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
 
-    const hasValue = el.value.trim() !== "";
-    el.classList.toggle("required-empty", !hasValue);
-    el.classList.toggle("required-filled", hasValue);
-  });
+  // Skip normal glow logic for payoutStatus (handled below)
+  if (id === "payoutStatus") return;
+
+  const hasValue = el.value.trim() !== "";
+  el.classList.toggle("required-empty", !hasValue);
+  el.classList.toggle("required-filled", hasValue);
+});
+
+// Special yellow state for payoutStatus default selection
+const payoutEl = document.getElementById("payoutStatus");
+if (payoutEl) {
+  const approvedCount = Number(document.getElementById("approvedCount").value || 0);
+
+  // Detect if user has NOT manually chosen anything yet
+  const isDefault =
+    approvedCount === 0
+      ? payoutEl.value === "none"
+      : payoutEl.value === "approved";
+
+  payoutEl.classList.toggle("required-unselected", isDefault);
+  payoutEl.classList.toggle("required-filled", !isDefault);
+  payoutEl.classList.toggle("required-empty", false); // never red
+}
 
   // Checkboxes
   requiredCheckboxes.forEach(id => {
