@@ -269,6 +269,17 @@
   border-color: #22c55e !important; /* your green tone */
   box-shadow: 0 0 8px rgba(34, 197, 94, .55);
 }
+ /* =======================
+   CHECKBOX COMPLETION STATES
+   ======================= */
+
+.checkbox-required-empty {
+  filter: drop-shadow(0 0 6px rgba(251, 113, 133, .65)); /* red */
+}
+
+.checkbox-required-filled {
+  filter: drop-shadow(0 0 6px rgba(34, 197, 94, .65)); /* green */
+}
 </style>
 </head>
 <body>
@@ -767,8 +778,8 @@ function getInputs(){
     requestedPayout: num(fields.requestedPayout?.value),
   };
 }
- function updateInputGlow() {
-  const requiredFields = [
+function updateInputGlow() {
+  const requiredInputs = [
     "currentBalance",
     "requestedPayout",
     "highestProfitDay",
@@ -776,14 +787,50 @@ function getInputs(){
     "profitableDays"
   ];
 
-  requiredFields.forEach(id => {
+  const requiredDropdowns = [
+    "paStatus",
+    "account",
+    "payoutStatus"
+  ];
+
+  const requiredCheckboxes = [
+    "rule_scaling",
+    "rule_mae",
+    "rule_risk",
+    "rule_hedge",
+    "rule_direction"
+  ];
+
+  // Text inputs
+  requiredInputs.forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
 
     const hasValue = el.value.trim() !== "" && el.value.trim() !== "0";
-
     el.classList.toggle("required-empty", !hasValue);
     el.classList.toggle("required-filled", hasValue);
+  });
+
+  // Dropdowns
+  requiredDropdowns.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    const hasValue = el.value.trim() !== "";
+    el.classList.toggle("required-empty", !hasValue);
+    el.classList.toggle("required-filled", hasValue);
+  });
+
+  // Checkboxes
+  requiredCheckboxes.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    const wrapper = el.closest("li"); // glow whole row
+    const checked = el.checked;
+
+    wrapper.classList.toggle("checkbox-required-empty", !checked);
+    wrapper.classList.toggle("checkbox-required-filled", checked);
   });
 }
 
