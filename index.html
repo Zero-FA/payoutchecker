@@ -804,7 +804,18 @@ requiredDropdowns.forEach(id => {
   const el = document.getElementById(id);
   if (!el) return;
 
-  const hasValue = el.value.trim() !== "";
+  let hasValue = el.value.trim() !== "";
+
+  // SPECIAL CASE:
+  // If approvedCount == 0 AND payoutStatus == "none"
+  // → treat as filled (green)
+  if (id === "payoutStatus") {
+    const approved = Number(fields.approvedCount.value || 0);
+    if (approved === 0 && el.value === "none") {
+      hasValue = true;
+    }
+  }
+
   el.classList.toggle("required-empty", !hasValue);
   el.classList.toggle("required-filled", hasValue);
 });
