@@ -323,24 +323,26 @@
         <div class="grid cols2" style="gap:10px 12px">
           <div>
             <div class="label">PA Status</div>
-            <select id="paStatus" class="select">
-              <option>Active</option>
-              <option>Account Blown</option>
-              <option>Failed Rebill</option>
-              <option>Invoice Cancelled</option>
-            </select>
+<select id="paStatus" class="select">
+  <option value="">— Select PA Status —</option>
+  <option>Active</option>
+  <option>Account Blown</option>
+  <option>Failed Rebill</option>
+  <option>Invoice Cancelled</option>
+</select>
           </div>
           <div>
             <div class="label">Account Size</div>
-            <select id="account" class="select">
-              <option value="25k">$25k</option>
-              <option value="50k" selected>$50k</option>
-              <option value="100k">$100k</option>
-              <option value="150k">$150k</option>
-              <option value="250k">$250k</option>
-              <option value="300k">$300k</option>
-              <option value="100kStatic">$100k Static</option>
-            </select>
+<select id="account" class="select">
+  <option value="">— Select Account —</option>
+  <option value="25k">$25k</option>
+  <option value="50k">$50k</option>
+  <option value="100k">$100k</option>
+  <option value="150k">$150k</option>
+  <option value="250k">$250k</option>
+  <option value="300k">$300k</option>
+  <option value="100kStatic">$100k Static</option>
+</select>
           </div>
 
           <div>
@@ -354,11 +356,12 @@
 
           <div>
             <div class="label">Last Payout Status</div>
-            <select id="payoutStatus" class="select">
-              <option value="none">None yet</option>
-              <option value="approved">Approved</option>
-              <option value="denied">Denied</option>
-            </select>
+<select id="payoutStatus" class="select">
+  <option value="">— Select Last Payout Status —</option>
+  <option value="none">None yet</option>
+  <option value="approved">Approved</option>
+  <option value="denied">Denied</option>
+</select>
             <div id="payoutStatusHelp" class="help">
               All trading days since starting this PA count toward eligibility.
             </div>
@@ -832,22 +835,6 @@ requiredDropdowns.forEach(id => {
   el.classList.toggle("required-empty", !hasValue);
   el.classList.toggle("required-filled", hasValue);
 });
-
-// Special yellow state for payoutStatus default selection
-const payoutEl = document.getElementById("payoutStatus");
-if (payoutEl) {
-  const approvedCount = Number(document.getElementById("approvedCount").value || 0);
-
-  // Detect if user has NOT manually chosen anything yet
-  const isDefault =
-    approvedCount === 0
-      ? payoutEl.value === "none"
-      : payoutEl.value === "approved";
-
-  payoutEl.classList.toggle("required-unselected", isDefault);
-  payoutEl.classList.toggle("required-filled", !isDefault);
-  payoutEl.classList.toggle("required-empty", false); // never red
-}
 
   // Checkboxes
   requiredCheckboxes.forEach(id => {
