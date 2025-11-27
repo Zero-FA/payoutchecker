@@ -1,14 +1,14 @@
 export default function handler(req, res) {
-  // Extract IP
+  // Extract public IP
   const ip =
     req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
     req.socket?.remoteAddress ||
     "unknown";
 
-  // Get user agent
+  // User agent string
   const ua = req.headers["user-agent"] || "";
 
-  // Detection logic
+  // Browser detection (humans)
   const isBrowser =
     ua.includes("Chrome") ||
     ua.includes("Firefox") ||
@@ -17,32 +17,23 @@ export default function handler(req, res) {
     ua.includes("Mobile") ||
     ua.includes("Mozilla");
 
-  const isVercel =
-    ua.includes("Vercel") ||
-    ua.includes("node-fetch") ||
-    ua.includes("Next.js") ||
-    ua.includes("curl");
+  // If NOT a browser → ignore (don't log)
+  if (!isBrowser) {
+    return res.status(200).json({
+      ok: true,
+      type: "IGNORED_NON_HUMAN",
+      ip,
+      userAgent: ua
+    });
+  }
 
-  const isHealthCheck =
-    ua.includes("Health") ||
-    ua.includes("ELB") ||
-    ua.includes("Monitor") ||
-    ua.includes("Uptime");
-
-  let type = "UNKNOWN";
-
-  if (isBrowser) type = "HUMAN";
-  else if (isVercel) type = "VERCEL_EDGE";
-  else if (isHealthCheck) type = "HEALTH_CHECK";
-  else type = "OTHER";
-
-  // Clean console output
-  console.log(`[${type}] IP: ${ip}`);
+  // LOG ONLY REAL HUMAN VISITORS
+  console.log(`[HUMAN] IP: ${ip}`);
 
   // API response
-  res.status(200).json({
+  return res.status(200).json({
     ok: true,
-    type,
+    type: "HUMAN",
     ip,
     userAgent: ua
   });
