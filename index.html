@@ -507,32 +507,68 @@
 
   </div>
 </div>
- <div class="card" style="margin-top:20px;">
+<div class="card" style="margin-top:20px;">
   <div class="h1" style="font-size:20px;margin-bottom:8px;">
-    Simple Explanations of Apex Trading Rules
+    Simple Explanations of Compliance Rules
   </div>
   <div class="help" style="margin-bottom:18px;">
-    These rules are checked during payout review. Here's what they mean in plain English:
+    These rules are checked during payout review. Here's what they mean in plain English, with examples:
   </div>
 
+  <!-- Contract Scaling Rule -->
   <div style="margin-bottom:12px;"><strong>Contract Scaling Rule</strong></div>
-  <div class="help">Trade only the max number of contracts allowed for your account size. Going over it results in a denied payout.</div>
+  <div class="help">
+    Trade only the max number of contracts allowed for your account size. Going over it results in a denied payout.
+  </div>
+  <div class="help" style="margin-top:4px;color:#93c5fd;">
+    <em>Example:</em> On a 50k PA you're allowed 6 micros (0.6 ES).  
+    If you open 8 micros → that breaks scaling → payout denied.
+  </div>
   <hr>
 
+  <!-- 30% MAE Rule -->
   <div style="margin-bottom:12px;"><strong>30% Negative P&L Rule (MAE)</strong></div>
-  <div class="help">Your largest winning day cannot be more than 30% of your total profit. One huge day is considered inconsistent.</div>
+  <div class="help">
+    Your largest winning day cannot be more than 30% of your total profit. One huge day is considered inconsistent.
+  </div>
+  <div class="help" style="margin-top:4px;color:#93c5fd;">
+    <em>Example:</em> You made $1,000 total profit. Your biggest day was $450.  
+    450 ÷ 1,000 = 45% → this fails the rule → keep trading until it's under 30%.
+  </div>
   <hr>
 
+  <!-- 5:1 Risk–Reward -->
   <div style="margin-bottom:12px;"><strong>5:1 Risk–Reward Ratio Rule</strong></div>
-  <div class="help">Your stop loss cannot be way bigger than your profit target. Oversized losses violate the rule.</div>
+  <div class="help">
+    Your stop loss cannot be way bigger than your profit target. Oversized losses violate the rule.
+  </div>
+  <div class="help" style="margin-top:4px;color:#93c5fd;">
+    <em>Example:</em> If your take-profit is $100, your stop cannot be $700.  
+    That's a 1:7 ratio → fails.  
+    A $300 stop with a $100 target → passes.
+  </div>
   <hr>
 
+  <!-- Hedging Rule -->
   <div style="margin-bottom:12px;"><strong>Hedging Rule</strong></div>
-  <div class="help">You cannot be long and short at the same time on the same or correlated markets (like ES/MES). No offsetting trades.</div>
+  <div class="help">
+    You cannot be long and short at the same time on the same or correlated markets (like ES/MES). No offsetting trades.
+  </div>
+  <div class="help" style="margin-top:4px;color:#93c5fd;">
+    <em>Example:</em> Long ES + Short MES at the same time = hedging → rule break.  
+    Long ES + Long MES at the same time = okay.
+  </div>
   <hr>
 
+  <!-- One Direction Rule -->
   <div style="margin-bottom:12px;"><strong>One Direction Rule</strong></div>
-  <div class="help">All positions and working orders must be in the same direction. If you're long, your pending orders must also be long.</div>
+  <div class="help">
+    All positions and working orders must be in the same direction. If you're long, your pending orders must also be long.
+  </div>
+  <div class="help" style="margin-top:4px;color:#93c5fd;">
+    <em>Example:</em> You are long ES, but you have a working sell limit order above the market.  
+    That’s a short order → violates the rule → payout will be denied.
+  </div>
 </div>
 
 <script>
