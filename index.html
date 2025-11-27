@@ -507,6 +507,33 @@
 
   </div>
 </div>
+ <div class="card" style="margin-top:20px;">
+  <div class="h1" style="font-size:20px;margin-bottom:8px;">
+    Simple Explanations of Apex Trading Rules
+  </div>
+  <div class="help" style="margin-bottom:18px;">
+    These rules are checked during payout review. Here's what they mean in plain English:
+  </div>
+
+  <div style="margin-bottom:12px;"><strong>Contract Scaling Rule</strong></div>
+  <div class="help">Trade only the max number of contracts allowed for your account size. Going over it results in a denied payout.</div>
+  <hr>
+
+  <div style="margin-bottom:12px;"><strong>30% Negative P&L Rule (MAE)</strong></div>
+  <div class="help">Your largest winning day cannot be more than 30% of your total profit. One huge day is considered inconsistent.</div>
+  <hr>
+
+  <div style="margin-bottom:12px;"><strong>5:1 Risk–Reward Ratio Rule</strong></div>
+  <div class="help">Your stop loss cannot be way bigger than your profit target. Oversized losses violate the rule.</div>
+  <hr>
+
+  <div style="margin-bottom:12px;"><strong>Hedging Rule</strong></div>
+  <div class="help">You cannot be long and short at the same time on the same or correlated markets (like ES/MES). No offsetting trades.</div>
+  <hr>
+
+  <div style="margin-bottom:12px;"><strong>One Direction Rule</strong></div>
+  <div class="help">All positions and working orders must be in the same direction. If you're long, your pending orders must also be long.</div>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
