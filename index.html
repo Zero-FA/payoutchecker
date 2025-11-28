@@ -1049,9 +1049,11 @@ checklistHeader.addEventListener("click", () => {
 
 updateInputGlow();
 render();
+});
+</script>
 
-}); // DOMContentLoaded
- <script>
+<!-- TRACKING SCRIPT -->
+<script>
 (function () {
   const sessionId = Math.random().toString(36).substring(2);
   const start = Date.now();
@@ -1089,7 +1091,7 @@ render();
     }
   }
 
-  // Page view on load
+  // Page view
   window.addEventListener("load", function () {
     sendEvent("page_view", {});
   });
@@ -1114,13 +1116,13 @@ render();
     }
   });
 
-  // Session end / duration
+  // Session end
   window.addEventListener("beforeunload", function () {
     const durationMs = Date.now() - start;
     sendEvent("session_end", { durationMs });
   });
 })();
 </script>
-</body>
+
 </body>
 </html>
