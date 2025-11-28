@@ -4,7 +4,7 @@ import fetch from "node-fetch";
 
 export const config = {
   api: {
-    bodyParser: false, // required for file uploads
+    bodyParser: false, // required for form-data file uploads
   },
 };
 
@@ -17,59 +17,82 @@ export default async function handler(req, res) {
 
   console.log("🔥 API HIT: POST");
 
-  const form = formidable({ multiples: false });
+  // Create formidable instance
+  const form = formidable({
+    multiples: false,
+    keepExtensions: true
+  });
 
+  // Parse incoming multipart form-data
   form.parse(req, async (err, fields, files) => {
     if (err) {
-      console.error("Parse error:", err);
-      return res.status(500).json({ error: "Failed to parse form-data" });
+      console.error("❌ Form parse error:", err);
+      return res.status(500).json({ error: "Failed to parse upload form" });
     }
 
-    const file = files.file?.[0];
-    console.log("📂 Parsed file:", file ? {
-      original: file.originalFilename,
-      path: file.filepath,
-      size: file.size
+    // File will be under files.file[0] because of your frontend
+    const uploaded = files.file?.[0];
+
+    console.log("📂 Parsed file:", uploaded ? {
+      original: uploaded.originalFilename,
+      path: uploaded.filepath,
+      size: uploaded.size
     } : "NO FILE FOUND");
 
-    if (!file || !file.filepath) {
-      return res.status(400).json({ error: "No file uploaded" });
+    if (!uploaded || !uploaded.filepath) {
+      return res.status(400).json({ error: "No CSV uploaded" });
     }
 
     try {
-console.log("⬆️ Uploading file to TradesViz…");
+      console.log("⬆️ Uploading file to TradesViz…");
 
-const uploadRes = await fetch(
-  "https://api.tradesviz.com/v1/import/trades/broker/csv/?broker=tradovate",
-  {
-    method: "POST",
-    headers: {
-      Authorization: `Token ${TRADESVIZ_API_KEY}`,
-    },
-    body: fs.createReadStream(file.filepath),
-    redirect: "manual"
-  }
-);
+      // IMPORTANT: this is the REAL endpoint (not /v1/)
+      const TV_URL =
+        "https://api.tradesviz.com/import/trades/broker/csv/?broker=tradovate";
 
-const text = await uploadRes.text();
-console.log("📥 Upload response:", uploadRes.status, text);
+      const uploadRes = await fetch(TV_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Token ${TRADESVIZ_API_KEY}`,
+          // DO NOT set Content-Type manually — fetch handles it when streaming
+        },
+        body: fs.createReadStream(uploaded.filepath),
+        redirect: "manual" // prevent stream redirect failures
+      });
 
-let uploadJson = null;
-try {
-  uploadJson = JSON.parse(text);
-} catch (err) {
-  console.error("JSON parse fail (likely HTML or redirect)");
-}
-      // return success
-      res.status(200).json({
+      const text = await uploadRes.text();
+
+      console.log("📥 Upload response:", uploadRes.status, text);
+
+      // Try JSON parse — but may return HTML if the API key is wrong or URL invalid
+      let uploadJson = null;
+      try {
+        uploadJson = JSON.parse(text);
+      } catch (err) {
+        console.error("❌ JSON parse error — HTML received instead of JSON");
+      }
+
+      // If not JSON or not success, return raw text for debugging
+      if (!uploadJson || !uploadJson.success) {
+        return res.status(500).json({
+          error: "TradesViz upload failed",
+          status: uploadRes.status,
+          raw: text
+        });
+      }
+
+      // Success!
+      return res.status(200).json({
         ok: true,
-        message: "CSV uploaded to TradesViz",
         upload: uploadJson
       });
 
     } catch (e) {
       console.error("🔥 SERVER ERROR:", e);
-      res.status(500).json({ error: "Server error", detail: e.message });
+      return res.status(500).json({
+        error: "Server encountered an error",
+        detail: e.message
+      });
     }
   });
 }
