@@ -1115,30 +1115,36 @@ const processBtn = document.getElementById("processCsvBtn");
 const resultsBox = document.getElementById("csvResults");
 
 if (processBtn) {
-  processBtn.addEventListener("click", async () => {
-    if (!window.uploadedCSVFiles || window.uploadedCSVFiles.length === 0) {
-      resultsBox.innerHTML = `<span style="color:#fb7185">Please upload at least one CSV first.</span>`;
-      return;
-    }
+processBtn.addEventListener("click", async () => {
+  if (!window.uploadedCSVFiles || window.uploadedCSVFiles.length === 0) {
+    resultsBox.innerHTML = `<span style="color:#fb7185">Please upload at least one CSV first.</span>`;
+    return;
+  }
 
-    // Show loader
-    resultsBox.innerHTML = `
-      <div style="color:#93c5fd;">Processing CSV… Please wait.</div>
-    `;
+  const formData = new FormData();
+  formData.append("file", window.uploadedCSVFiles[0]);
 
-    // Placeholder: In future this will POST to your backend.
-    // For now we simulate a delay + fake response.
-    setTimeout(() => {
-      resultsBox.innerHTML = `
-        <div style="color:#22c55e;font-weight:600;">
-          CSV accepted — backend integration coming next!
-        </div>
-        <div style="margin-top:6px;color:#a5b4fc;">
-          Ready for Tradovate → TradesViz → Apex Rule Processing.
-        </div>
-      `;
-    }, 1200);
+  resultsBox.innerHTML = `<div style="color:#93c5fd;">Uploading to TradesViz…</div>`;
+
+  const res = await fetch("/api/upload-tradovate", {
+    method: "POST",
+    body: formData
   });
+
+  const data = await res.json();
+
+  if (data.error) {
+    resultsBox.innerHTML = `<div style="color:#fb7185;">Error: ${JSON.stringify(data.error)}</div>`;
+    return;
+  }
+
+  resultsBox.innerHTML = `
+    <div style="color:#22c55e;font-weight:600;">Trades Loaded ✔</div>
+    <pre style="margin-top:10px;background:#0f172a;padding:12px;border-radius:6px;max-height:300px;overflow:auto;">
+${JSON.stringify(data.trades, null, 2)}
+    </pre>
+  `;
+});
 }
   const dropzone = document.getElementById("dropzone");
   const fileInput = document.getElementById("csvInput");
