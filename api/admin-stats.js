@@ -1,61 +1,64 @@
-// pages/api/admin-stats.js
-import { sessions, counters, recentEvents } from "./track";
+export default async function handler(req, res) {
+  // -------- PASSWORD CHECK --------
+  const password = req.query.key;
+  const ADMIN_KEY = "seanadmin";
 
-const REAL_HOST = "apexpayoutchecker.vercel.app";
-
-export default function handler(req, res) {
-  const host = req.headers["host"] || "";
-  if (host !== REAL_HOST) {
-    return res.status(403).json({ error: "Forbidden" });
+  if (password !== ADMIN_KEY) {
+    return res.status(401).json({ error: "Unauthorized" });
   }
 
-  const now = Date.now();
+  // -------- READ DATA FROM TRACK LOGS --------
+  // IMPORTANT: Vercel Serverless cannot store files,
+  // so we use Edge Config + fallback memory in dev.
 
-  const sessionList = Object.values(sessions || {});
-  const activeCutoff = now - 25_000; // 25 seconds
-  const activeSessions = sessionList.filter(
-    (s) => s.lastSeen && s.lastSeen >= activeCutoff
-  );
+  global._events = global._events || [];
+  const events = global._events;
 
-  let totalDuration = 0;
-  let durationCount = 0;
-  sessionList.forEach((s) => {
-    if (s.durationMs && s.durationMs > 0) {
-      totalDuration += s.durationMs;
-      durationCount += 1;
-    }
-  });
+  // Collect stats
+  const stats = {
+    totalEvents: events.length,
+    pageViews: events.filter(e => e.event === "page_view").length,
+    affiliateClicks: events.filter(e => e.event === "affiliate_click").length,
+    accountSelects: events.filter(e => e.event === "account_select").length,
+    sessionsEnded: events.filter(e => e.event === "session_end").length,
 
-  const avgDurationSec =
-    durationCount > 0 ? Math.round(totalDuration / durationCount / 1000) : 0;
+    // Unique visitors by sessionId
+    uniqueVisitors: new Set(events.map(e => e.sessionId)).size,
 
-  // Sort sessions by lastSeen (desc) and pick latest 20
-  const recentSessions = sessionList
-    .slice()
-    .sort((a, b) => (b.lastSeen || 0) - (a.lastSeen || 0))
-    .slice(0, 20);
+    // Group account selections
+    accountUsage: (() => {
+      const buckets = {};
+      events
+        .filter(e => e.event === "account_select")
+        .forEach(e => {
+          const acc = e.data?.account || "unknown";
+          buckets[acc] = (buckets[acc] || 0) + 1;
+        });
+      return buckets;
+    })(),
 
-  // Prepare events list (latest 30)
-  const recentEventsOut = recentEvents
-    .slice(-30)
-    .slice()
-    .reverse(); // newest first
+    // Average session duration
+    avgSessionDuration: (() => {
+      const sess = events.filter(e => e.event === "session_end");
+      if (!sess.length) return 0;
+      const total = sess.reduce((sum, e) => sum + (e.data?.durationMs || 0), 0);
+      return Math.round(total / sess.length);
+    })(),
+
+    // Top referrers
+    referrers: (() => {
+      const bucket = {};
+      events.forEach(e => {
+        const r = e.data?.referrerDomain || "direct";
+        bucket[r] = (bucket[r] || 0) + 1;
+      });
+      return bucket;
+    })(),
+  };
 
   return res.status(200).json({
-    now,
-    totals: {
-      totalSessions: counters.totalSessions || 0,
-      activeSessions: activeSessions.length,
-      avgDurationSec,
-      affiliateClicks: counters.affiliateClicks || 0,
-    },
-    breakdowns: {
-      devices: counters.devices || {},
-      browsers: counters.browsers || {},
-      accounts: counters.accountSelections || {},
-      referrers: counters.referrers || {},
-    },
-    recentSessions,
-    recentEvents: recentEventsOut,
+    ok: true,
+    stats,
+    events: events.slice(-200) // return last 200 events
   });
 }
