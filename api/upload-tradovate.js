@@ -44,6 +44,9 @@ export default async function handler(req, res) {
     }
 
     try {
+      // 👇 ADD THIS RIGHT HERE
+console.log("🔑 ENV KEY LENGTH:", TRADESVIZ_API_KEY?.length || "missing");
+console.log("🔑 FIRST 8 CHARS:", TRADESVIZ_API_KEY?.slice(0, 8) || "missing");
       console.log("⬆️ Uploading file to TradesViz…");
 
       // IMPORTANT: this is the REAL endpoint (not /v1/)
