@@ -1,4 +1,4 @@
-import formidable from "formidable";
+import { formidable } from "formidable";
 import fs from "fs";
 import fetch from "node-fetch";
 
@@ -12,11 +12,14 @@ export default async function handler(req, res) {
   console.log("🔥 API HIT:", req.method);
 
   if (req.method !== "POST") {
-    console.log("❌ Method not allowed:", req.method);
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const form = new formidable.IncomingForm();
+  // Create Formidable parser (v3 syntax)
+  const form = formidable({
+    multiples: false,
+    keepExtensions: true,
+  });
 
   form.parse(req, async (err, fields, files) => {
     if (err) {
@@ -24,11 +27,11 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Upload failed" });
     }
 
-    console.log("📂 Files parsed:", Object.keys(files));
+    console.log("📂 Parsed files:", files);
 
-    const file = files.file;
+    const file = files.file?.[0]; // v3 returns an array
     if (!file) {
-      console.log("❌ No file in upload");
+      console.log("❌ No file found in upload");
       return res.status(400).json({ error: "No file uploaded" });
     }
 
@@ -46,18 +49,15 @@ export default async function handler(req, res) {
         }
       );
 
-      console.log("📥 TradesViz upload status:", uploadRes.status);
-
+      console.log("📥 Upload status:", uploadRes.status);
       const uploadJson = await uploadRes.json();
-      console.log("📃 TradesViz upload JSON:", uploadJson);
+      console.log("📃 Upload response:", uploadJson);
 
       if (!uploadJson.success) {
-        console.log("❌ Upload to TradesViz failed");
         return res.status(500).json({ error: uploadJson });
       }
 
       const importId = uploadJson.import_id;
-
       console.log("⏳ Polling import:", importId);
 
       let processed = false;
@@ -82,11 +82,12 @@ export default async function handler(req, res) {
       }
 
       if (!processed) {
-        console.log("❌ TradesViz processing timeout");
-        return res.status(500).json({ error: "TradesViz processing timeout" });
+        return res.status(500).json({
+          error: "TradesViz processing timeout",
+        });
       }
 
-      console.log("⬇️ Downloading detailed CSV...");
+      console.log("⬇️ Downloading full CSV…");
 
       const fullRes = await fetch(
         "https://api.tradesviz.com/v1/export/trades/csv/",
@@ -105,10 +106,8 @@ export default async function handler(req, res) {
         }
       );
 
-      console.log("📥 Detailed CSV status:", fullRes.status);
-
       const csvText = await fullRes.text();
-      console.log("📄 Received CSV length:", csvText.length);
+      console.log("📄 CSV received, length:", csvText.length);
 
       return res.status(200).json({
         ok: true,
@@ -116,7 +115,7 @@ export default async function handler(req, res) {
         preview: csvText.slice(0, 500),
       });
     } catch (e) {
-      console.log("🔥 SERVER CRASH:", e);
+      console.log("🔥 SERVER ERROR:", e);
       return res.status(500).json({
         error: "Server error",
         details: e.message,
