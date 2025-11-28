@@ -399,56 +399,6 @@
           Confirm you followed these rules during the payout period. If not, your payout may be denied. There are simple explanations at the bottom of the page, but it's best to read the official FAQs since they go into much more detail.
         </div>
         <ul id="rulesList" class="list rules-grid"></ul>
-       <!-- CSV Upload Section -->
-<div class="card" id="csv-upload-card">
-  <div class="h1" style="font-size:18px;margin-bottom:8px;">
-    Deep Trade Analysis (Upload Tradovate CSV)
-  </div>
-  <div class="help" style="margin-bottom:12px;">
-    Upload your Tradovate order history CSV for full Apex PA rule analysis
-    (MAE, MFE, Risk-to-Reward, Scaling, and Behavior).
-  </div>
-
-  <!-- Drag & Drop Zone -->
-  <div id="dropzone"
-      style="
-        border:2px dashed #1d4ed8;
-        padding:20px;
-        border-radius:14px;
-        text-align:center;
-        background:rgba(15,23,42,.65);
-        cursor:pointer;
-      ">
-    <strong>Drag & Drop Tradovate CSV Here</strong><br>
-    <span style="font-size:12px;color:#9ca3af;">or click to browse</span>
-  </div>
-
-  <!-- Hidden File Input -->
-<input id="csvInput" name="file" type="file" accept=".csv" multiple style="display:none;" />
-  <!-- Placeholder for Upload Status -->
-  <div id="csvStatus" style="margin-top:12px;font-size:14px;color:#93c5fd;">
-  </div>
- <!-- Process CSV Button -->
-<button id="processCsvBtn"
-  style="
-    margin-top:14px;
-    background:#1d4ed8;
-    border:1px solid #3b82f6;
-    color:white;
-    padding:10px 16px;
-    border-radius:10px;
-    font-size:14px;
-    cursor:pointer;
-    width:100%;
-  ">
-  Process CSV (Deep Analysis)
-</button>
-
-<!-- Placeholder for results -->
-<div id="csvResults"
-  style="margin-top:16px;font-size:14px;color:#e5e7eb;">
-</div>
-</div>
       </div>
 
       <!-- Eligibility Checklist (accordion, bottom-left) -->
@@ -1099,186 +1049,23 @@ checklistHeader.addEventListener("click", () => {
 
 updateInputGlow();
 render();
-});
+
+}); // DOMContentLoaded
 </script>
-<script>
-// --------------------------
-// CSV Upload / Drag & Drop
-// --------------------------
-
-document.addEventListener("DOMContentLoaded", () => {
- // --------------------------
-// Process CSV Button
-// --------------------------
-const processBtn = document.getElementById("processCsvBtn");
-const resultsBox = document.getElementById("csvResults");
-
-if (processBtn) {
-processBtn.addEventListener("click", async () => {
-  if (!window.uploadedCSVFiles || window.uploadedCSVFiles.length === 0) {
-    resultsBox.innerHTML = `<span style="color:#fb7185">Please upload at least one CSV first.</span>`;
-    return;
-  }
-
-const formData = new FormData();
-formData.append("file", window.uploadedCSVFiles[0], window.uploadedCSVFiles[0].name);
-
-  resultsBox.innerHTML = `<div style="color:#93c5fd;">Uploading to TradesViz…</div>`;
-
-  const res = await fetch("/api/upload-tradovate", {
-    method: "POST",
-    body: formData
-  });
-
-  const data = await res.json();
-
-  if (data.error) {
-    resultsBox.innerHTML = `<div style="color:#fb7185;">Error: ${JSON.stringify(data.error)}</div>`;
-    return;
-  }
-
-  resultsBox.innerHTML = `
-    <div style="color:#22c55e;font-weight:600;">Trades Loaded ✔</div>
-    <pre style="margin-top:10px;background:#0f172a;padding:12px;border-radius:6px;max-height:300px;overflow:auto;">
-${JSON.stringify(data.trades, null, 2)}
-    </pre>
-  `;
-});
-}
-  const dropzone = document.getElementById("dropzone");
-  const fileInput = document.getElementById("csvInput");
-  const statusBox = document.getElementById("csvStatus");
-
-  if (!dropzone || !fileInput) return;
-
-  // Click opens file browser
-  dropzone.addEventListener("click", () => {
-    fileInput.click();
-  });
-
-  // Handle file selection from click
-  fileInput.addEventListener("change", (e) => {
-    const files = [...e.target.files];
-    handleFiles(files);
-  });
-
-  // Drag over styling
-  dropzone.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    dropzone.style.borderColor = "#3b82f6";
-  });
-
-  dropzone.addEventListener("dragleave", () => {
-    dropzone.style.borderColor = "#1d4ed8";
-  });
-
-  // Handle drop
-  dropzone.addEventListener("drop", (e) => {
-    e.preventDefault();
-    dropzone.style.borderColor = "#1d4ed8";
-
-    const files = [...e.dataTransfer.files];
-    handleFiles(files);
-  });
-
-  // Main handler
-  function handleFiles(files) {
-    if (!files.length) return;
-
-    // Filter for CSV only
-    const csvFiles = files.filter(f => f.name.toLowerCase().endsWith(".csv"));
-
-    if (csvFiles.length === 0) {
-      statusBox.innerHTML = `<span style="color:#fb7185">Invalid file type. Please upload CSV files only.</span>`;
-      return;
-    }
-
-    // Show filenames
-    let list = csvFiles.map(f => `• ${f.name}`).join("<br>");
-    statusBox.innerHTML = `
-      <div style="color:#a5b4fc">
-        ${csvFiles.length} file(s) loaded:<br>${list}
-      </div>
-      <div style="margin-top:8px;color:#93c5fd;font-size:13px;">
-        Ready for analysis (backend not connected yet).
-      </div>
-    `;
-
-    // Store globally for later backend upload
-    window.uploadedCSVFiles = csvFiles;
-  }
-});
+<script src="https://cdn.vercel-insights.com/v1/script.js" defer></script>
+ <script>
+fetch("/api/log-ip", { method: "GET" });
 </script>
-<!-- TRACKING SCRIPT -->
-<script>
-(function () {
-  const sessionId = Math.random().toString(36).substring(2);
-  const start = Date.now();
+ <script>
+  let pingId = Math.random().toString(36).substring(2); // anonymous session id
 
-  function sendEvent(event, data) {
-    const payload = {
-      sessionId,
-      event,
-      data: Object.assign(
-        {
-          path: location.pathname,
-          referrer: document.referrer || null,
-          referrerDomain: (document.referrer || "")
-            .replace(/^https?:\/\//, "")
-            .split("/")[0] || "direct",
-        },
-        data || {}
-      ),
-      ts: Date.now(),
-    };
+  // Send ping every 10 seconds
+  setInterval(() => {
+    fetch(`/api/ping?session=${pingId}`, { method: "GET" });
+  }, 10000);
 
-    const blob = new Blob([JSON.stringify(payload)], {
-      type: "application/json",
-    });
-
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon("/api/log-ip", blob);
-    } else {
-      fetch("/api/log-ip", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        keepalive: true,
-      }).catch(() => {});
-    }
-  }
-
-  // Page view
-  window.addEventListener("load", function () {
-    sendEvent("page_view", {});
-  });
-
-  // Account selection
-  window.addEventListener("DOMContentLoaded", function () {
-    const accountSelect = document.getElementById("account");
-    if (accountSelect) {
-      accountSelect.addEventListener("change", function () {
-        if (accountSelect.value) {
-          sendEvent("account_select", { account: accountSelect.value });
-        }
-      });
-    }
-
-    // Affiliate button click
-    const affBtn = document.querySelector(".aff-btn");
-    if (affBtn) {
-      affBtn.addEventListener("click", function () {
-        sendEvent("affiliate_click", {});
-      });
-    }
-  });
-
-  // Session end
-  window.addEventListener("beforeunload", function () {
-    const durationMs = Date.now() - start;
-    sendEvent("session_end", { durationMs });
-  });
-})();
+  // Send a ping as soon as the page loads
+  fetch(`/api/ping?session=${pingId}`, { method: "GET" });
 </script>
 </body>
 </html>
