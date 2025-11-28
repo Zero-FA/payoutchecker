@@ -36,22 +36,23 @@ export default async function handler(req, res) {
     }
 
     try {
-      console.log("⬆️ Uploading to TradesViz...");
+console.log("⬆️ Uploading to TradesViz...");
 
-      const uploadRes = await fetch(
-        "https://api.tradesviz.com/v1/import/trades/csv/",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Token ${TRADESVIZ_API_KEY}`,
-          },
-          body: fs.createReadStream(file.filepath),
-        }
-      );
+const uploadRes = await fetch(
+  "https://api.tradesviz.com/v1/import/trades/",  // FIXED
+  {
+    method: "POST",
+    headers: {
+      Authorization: `Token ${TRADESVIZ_API_KEY}`,
+    },
+    body: fs.createReadStream(file.filepath),
+    redirect: "manual"
+  }
+);
 
-      console.log("📥 Upload status:", uploadRes.status);
-      const uploadJson = await uploadRes.json();
-      console.log("📃 Upload response:", uploadJson);
+console.log("📥 TradesViz upload status:", uploadRes.status);
+const uploadJson = await uploadRes.json();
+console.log("📃 TradesViz upload JSON:", uploadJson);
 
       if (!uploadJson.success) {
         return res.status(500).json({ error: uploadJson });
