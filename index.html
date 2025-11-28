@@ -1051,21 +1051,76 @@ updateInputGlow();
 render();
 
 }); // DOMContentLoaded
-</script>
-<script src="https://cdn.vercel-insights.com/v1/script.js" defer></script>
  <script>
-fetch("/api/log-ip", { method: "GET" });
-</script>
- <script>
-  let pingId = Math.random().toString(36).substring(2); // anonymous session id
+(function () {
+  const sessionId = Math.random().toString(36).substring(2);
+  const start = Date.now();
 
-  // Send ping every 10 seconds
-  setInterval(() => {
-    fetch(`/api/ping?session=${pingId}`, { method: "GET" });
-  }, 10000);
+  function sendEvent(event, data) {
+    const payload = {
+      sessionId,
+      event,
+      data: Object.assign(
+        {
+          path: location.pathname,
+          referrer: document.referrer || null,
+          referrerDomain: (document.referrer || "")
+            .replace(/^https?:\/\//, "")
+            .split("/")[0] || "direct",
+        },
+        data || {}
+      ),
+      ts: Date.now(),
+    };
 
-  // Send a ping as soon as the page loads
-  fetch(`/api/ping?session=${pingId}`, { method: "GET" });
+    const blob = new Blob([JSON.stringify(payload)], {
+      type: "application/json",
+    });
+
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon("/api/track", blob);
+    } else {
+      fetch("/api/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      }).catch(() => {});
+    }
+  }
+
+  // Page view on load
+  window.addEventListener("load", function () {
+    sendEvent("page_view", {});
+  });
+
+  // Account selection
+  window.addEventListener("DOMContentLoaded", function () {
+    const accountSelect = document.getElementById("account");
+    if (accountSelect) {
+      accountSelect.addEventListener("change", function () {
+        if (accountSelect.value) {
+          sendEvent("account_select", { account: accountSelect.value });
+        }
+      });
+    }
+
+    // Affiliate button click
+    const affBtn = document.querySelector(".aff-btn");
+    if (affBtn) {
+      affBtn.addEventListener("click", function () {
+        sendEvent("affiliate_click", {});
+      });
+    }
+  });
+
+  // Session end / duration
+  window.addEventListener("beforeunload", function () {
+    const durationMs = Date.now() - start;
+    sendEvent("session_end", { durationMs });
+  });
+})();
 </script>
+</body>
 </body>
 </html>
