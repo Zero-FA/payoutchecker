@@ -13,7 +13,7 @@ export default function handler(req, res) {
   // Only allow logs from your real domain
   const isRealHost = host === REAL_HOST;
 
-  // Basic browser check for humans
+  // Basic browser check
   const isBrowser =
     ua.includes("Chrome") ||
     ua.includes("Firefox") ||
@@ -22,36 +22,18 @@ export default function handler(req, res) {
     ua.includes("Mobile") ||
     ua.includes("Mozilla");
 
-  // If not your real host → ignore completely
+  // ❗IGNORED HOSTS → RETURN NOTHING (no message in logs)
   if (!isRealHost) {
-    return res.status(200).json({
-      ok: true,
-      type: "IGNORED_NON_PRIMARY_HOST",
-      host,
-      ip,
-      userAgent: ua
-    });
+    return res.status(204).end(); // <-- No Content, Vercel logs NOTHING
   }
 
-  // If not a browser → ignore completely
+  // ❗IGNORED NON-HUMANS → RETURN NOTHING
   if (!isBrowser) {
-    return res.status(200).json({
-      ok: true,
-      type: "IGNORED_NON_HUMAN",
-      host,
-      ip,
-      userAgent: ua
-    });
+    return res.status(204).end();
   }
 
-  // LOG ONLY REAL HUMANS FROM YOUR REAL DOMAIN
+  // 🎯 LOG ONLY REAL HUMANS FROM YOUR REAL DOMAIN
   console.log(`[HUMAN] ${ip} | Host: ${host}`);
 
-  return res.status(200).json({
-    ok: true,
-    type: "HUMAN",
-    host,
-    ip,
-    userAgent: ua
-  });
+  return res.status(200).json({ ok: true });
 }
