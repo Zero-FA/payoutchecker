@@ -399,6 +399,37 @@
           Confirm you followed these rules during the payout period. If not, your payout may be denied. There are simple explanations at the bottom of the page, but it's best to read the official FAQs since they go into much more detail.
         </div>
         <ul id="rulesList" class="list rules-grid"></ul>
+       <!-- CSV Upload Section -->
+<div class="card" id="csv-upload-card">
+  <div class="h1" style="font-size:18px;margin-bottom:8px;">
+    Deep Trade Analysis (Upload Tradovate CSV)
+  </div>
+  <div class="help" style="margin-bottom:12px;">
+    Upload your Tradovate order history CSV for full Apex PA rule analysis
+    (MAE, MFE, Risk-to-Reward, Scaling, and Behavior).
+  </div>
+
+  <!-- Drag & Drop Zone -->
+  <div id="dropzone"
+      style="
+        border:2px dashed #1d4ed8;
+        padding:20px;
+        border-radius:14px;
+        text-align:center;
+        background:rgba(15,23,42,.65);
+        cursor:pointer;
+      ">
+    <strong>Drag & Drop Tradovate CSV Here</strong><br>
+    <span style="font-size:12px;color:#9ca3af;">or click to browse</span>
+  </div>
+
+  <!-- Hidden File Input -->
+  <input id="csvInput" type="file" accept=".csv" multiple style="display:none;" />
+
+  <!-- Placeholder for Upload Status -->
+  <div id="csvStatus" style="margin-top:12px;font-size:14px;color:#93c5fd;">
+  </div>
+</div>
       </div>
 
       <!-- Eligibility Checklist (accordion, bottom-left) -->
