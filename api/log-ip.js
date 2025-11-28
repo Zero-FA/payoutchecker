@@ -7,13 +7,10 @@ export default function handler(req, res) {
   const ua = req.headers["user-agent"] || "";
   const host = req.headers["host"] || "";
 
-  // Your real deployed domain
   const REAL_HOST = "apexpayoutchecker.vercel.app";
 
-  // Only allow logs from your real domain
   const isRealHost = host === REAL_HOST;
 
-  // Basic browser check for humans
   const isBrowser =
     ua.includes("Chrome") ||
     ua.includes("Firefox") ||
@@ -22,36 +19,15 @@ export default function handler(req, res) {
     ua.includes("Mobile") ||
     ua.includes("Mozilla");
 
-  // If not your real host → ignore completely
   if (!isRealHost) {
-    return res.status(200).json({
-      ok: true,
-      type: "IGNORED_NON_PRIMARY_HOST",
-      host,
-      ip,
-      userAgent: ua
-    });
+    return res.status(200).json({ ok: true, type: "IGNORED_NON_PRIMARY_HOST" });
   }
 
-  // If not a browser → ignore completely
   if (!isBrowser) {
-    return res.status(200).json({
-      ok: true,
-      type: "IGNORED_NON_HUMAN",
-      host,
-      ip,
-      userAgent: ua
-    });
+    return res.status(200).json({ ok: true, type: "IGNORED_NON_HUMAN" });
   }
 
-  // LOG ONLY REAL HUMANS FROM YOUR REAL DOMAIN
   console.log(`[HUMAN] ${ip} | Host: ${host}`);
 
-  return res.status(200).json({
-    ok: true,
-    type: "HUMAN",
-    host,
-    ip,
-    userAgent: ua
-  });
+  res.status(200).json({ ok: true, type: "HUMAN", ip });
 }
