@@ -1,64 +1,54 @@
 export default async function handler(req, res) {
-  // -------- PASSWORD CHECK --------
-  const password = req.query.key;
-  const ADMIN_KEY = "seanadmin";
-
-  if (password !== ADMIN_KEY) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-
-  // -------- READ DATA FROM TRACK LOGS --------
-  // IMPORTANT: Vercel Serverless cannot store files,
-  // so we use Edge Config + fallback memory in dev.
-
+  // Use global store (in-memory analytics)
   global._events = global._events || [];
   const events = global._events;
 
-  // Collect stats
   const stats = {
     totalEvents: events.length,
     pageViews: events.filter(e => e.event === "page_view").length,
     affiliateClicks: events.filter(e => e.event === "affiliate_click").length,
     accountSelects: events.filter(e => e.event === "account_select").length,
     sessionsEnded: events.filter(e => e.event === "session_end").length,
-
-    // Unique visitors by sessionId
     uniqueVisitors: new Set(events.map(e => e.sessionId)).size,
-
-    // Group account selections
-    accountUsage: (() => {
-      const buckets = {};
-      events
-        .filter(e => e.event === "account_select")
-        .forEach(e => {
-          const acc = e.data?.account || "unknown";
-          buckets[acc] = (buckets[acc] || 0) + 1;
-        });
-      return buckets;
-    })(),
-
-    // Average session duration
-    avgSessionDuration: (() => {
-      const sess = events.filter(e => e.event === "session_end");
-      if (!sess.length) return 0;
-      const total = sess.reduce((sum, e) => sum + (e.data?.durationMs || 0), 0);
-      return Math.round(total / sess.length);
-    })(),
-
-    // Top referrers
-    referrers: (() => {
-      const bucket = {};
-      events.forEach(e => {
-        const r = e.data?.referrerDomain || "direct";
-        bucket[r] = (bucket[r] || 0) + 1;
-      });
-      return bucket;
-    })(),
   };
 
-  return res.status(200).json({
-    ok: true,
-    stats,
-    events: events.slice(-200) // return last 200 events
+  // Build "recent sessions" and "recent events"
+  const recentEvents = events.slice(-50).reverse();
+  const recentSessions = events
+    .filter(e => e.event === "session_end")
+    .slice(-20)
+    .reverse()
+    .map(e => ({
+      sessionId: e.sessionId,
+      device: e.data.device || "Unknown",
+      browser: e.data.browser || "Unknown",
+      referrer: e.data.referrerDomain || "direct",
+      durationMs: e.data.durationMs || 0,
+      ipHash: e.data.ipHash || "",
+    }));
+
+  res.status(200).json({
+    totals: {
+      activeSessions: stats.pageViews - stats.sessionsEnded,
+      totalSessions: stats.pageViews,
+      avgDurationSec:
+        recentSessions.length > 0
+          ? Math.round(
+              recentSessions.reduce((a, b) => a + (b.durationMs || 0), 0) /
+              recentSessions.length /
+              1000
+            )
+          : 0,
+      affiliateClicks: stats.affiliateClicks,
+    },
+    breakdowns: {
+      devices: {},
+      browsers: {},
+      referrers: {},
+      accounts: {},
+    },
+    recentSessions,
+    recentEvents,
+    now: Date.now(),
   });
 }
