@@ -1,0 +1,9 @@
+{
+  "name": "apex-payout-checker",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "formidable": "^3.5.0",
+    "node-fetch": "^3.3.2"
+  }
+}
