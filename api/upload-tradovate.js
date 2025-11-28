@@ -37,26 +37,29 @@ export default async function handler(req, res) {
     }
 
     try {
-      console.log("⬆️ Uploading file to TradesViz…");
+console.log("⬆️ Uploading file to TradesViz…");
 
-      const uploadRes = await fetch(
-        "https://api.tradesviz.com/v1/import/trades/broker/csv/",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Token ${TRADESVIZ_API_KEY}`,
-          },
-          body: fs.createReadStream(file.filepath),
-        }
-      );
+const uploadRes = await fetch(
+  "https://api.tradesviz.com/v1/import/trades/broker/csv/?broker=tradovate",
+  {
+    method: "POST",
+    headers: {
+      Authorization: `Token ${TRADESVIZ_API_KEY}`,
+    },
+    body: fs.createReadStream(file.filepath),
+    redirect: "manual"
+  }
+);
 
-      const uploadJson = await uploadRes.json();
-      console.log("📥 Upload status:", uploadRes.status, uploadJson);
+const text = await uploadRes.text();
+console.log("📥 Upload response:", uploadRes.status, text);
 
-      if (!uploadJson.success) {
-        return res.status(500).json({ error: uploadJson });
-      }
-
+let uploadJson = null;
+try {
+  uploadJson = JSON.parse(text);
+} catch (err) {
+  console.error("JSON parse fail (likely HTML or redirect)");
+}
       // return success
       res.status(200).json({
         ok: true,
