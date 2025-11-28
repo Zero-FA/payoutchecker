@@ -1080,9 +1080,9 @@ render();
     });
 
     if (navigator.sendBeacon) {
-      navigator.sendBeacon("/api/track", blob);
+      navigator.sendBeacon("/api/log-ip", blob);
     } else {
-      fetch("/api/track", {
+      fetch("/api/log-ip", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
