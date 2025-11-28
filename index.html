@@ -1108,6 +1108,38 @@ render();
 // --------------------------
 
 document.addEventListener("DOMContentLoaded", () => {
+ // --------------------------
+// Process CSV Button
+// --------------------------
+const processBtn = document.getElementById("processCsvBtn");
+const resultsBox = document.getElementById("csvResults");
+
+if (processBtn) {
+  processBtn.addEventListener("click", async () => {
+    if (!window.uploadedCSVFiles || window.uploadedCSVFiles.length === 0) {
+      resultsBox.innerHTML = `<span style="color:#fb7185">Please upload at least one CSV first.</span>`;
+      return;
+    }
+
+    // Show loader
+    resultsBox.innerHTML = `
+      <div style="color:#93c5fd;">Processing CSV… Please wait.</div>
+    `;
+
+    // Placeholder: In future this will POST to your backend.
+    // For now we simulate a delay + fake response.
+    setTimeout(() => {
+      resultsBox.innerHTML = `
+        <div style="color:#22c55e;font-weight:600;">
+          CSV accepted — backend integration coming next!
+        </div>
+        <div style="margin-top:6px;color:#a5b4fc;">
+          Ready for Tradovate → TradesViz → Apex Rule Processing.
+        </div>
+      `;
+    }, 1200);
+  });
+}
   const dropzone = document.getElementById("dropzone");
   const fileInput = document.getElementById("csvInput");
   const statusBox = document.getElementById("csvStatus");
@@ -1169,38 +1201,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Store globally for later backend upload
     window.uploadedCSVFiles = csvFiles;
-   // --------------------------
-// Process CSV Button
-// --------------------------
-const processBtn = document.getElementById("processCsvBtn");
-const resultsBox = document.getElementById("csvResults");
-
-if (processBtn) {
-  processBtn.addEventListener("click", async () => {
-    if (!window.uploadedCSVFiles || window.uploadedCSVFiles.length === 0) {
-      resultsBox.innerHTML = `<span style="color:#fb7185">Please upload at least one CSV first.</span>`;
-      return;
-    }
-
-    // Show loader
-    resultsBox.innerHTML = `
-      <div style="color:#93c5fd;">Processing CSV… Please wait.</div>
-    `;
-
-    // Placeholder: In future this will POST to your backend.
-    // For now we simulate a delay + fake response.
-    setTimeout(() => {
-      resultsBox.innerHTML = `
-        <div style="color:#22c55e;font-weight:600;">
-          CSV accepted — backend integration coming next!
-        </div>
-        <div style="margin-top:6px;color:#a5b4fc;">
-          Ready for Tradovate → TradesViz → Apex Rule Processing.
-        </div>
-      `;
-    }, 1200);
-  });
-}
   }
 });
 </script>
