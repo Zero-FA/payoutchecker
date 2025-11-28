@@ -1,11 +1,12 @@
-import formidable from "formidable";
+// /api/upload-tradovate.js
 import fs from "fs";
+import formidable from "formidable";
 import FormData from "form-data";
 import fetch from "node-fetch";
 
 export const config = {
   api: {
-    bodyParser: false, // must be disabled for file uploads
+    bodyParser: false,
   },
 };
 
@@ -16,12 +17,10 @@ export default async function handler(req, res) {
 
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
-    }
+  }
 
-  const form = formidable({
-    multiples: false,
-    keepExtensions: true,
-  });
+  // Parse CSV upload with formidable
+  const form = formidable({ multiples: false });
 
   form.parse(req, async (err, fields, files) => {
     if (err) {
@@ -29,76 +28,72 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Failed to parse form" });
     }
 
-    const file = files.file?.[0] || files.file;
+    const file = files.file;
     if (!file) {
-      return res.status(400).json({ error: "No file uploaded" });
+      return res.status(400).json({ error: "CSV file missing" });
     }
 
-    console.log("📂 Parsed files:", files);
+    console.log("📂 Parsed file:", {
+      original: file.originalFilename,
+      path: file.filepath,
+      size: file.size,
+    });
 
     try {
-      // -------------------------
-      // 1. TradesViz Broker IMPORT (Tradovate)
-      // -------------------------
+      // ----------------------------------
+      // 1) UPLOAD TO TRADESVIZ (BROKER API)
+      // ----------------------------------
       console.log("⬆️ Uploading file to TradesViz…");
 
-      const formData = new FormData();
-
-      formData.append(
-        "file",
-        fs.createReadStream(file.filepath),
-        file.originalFilename
-      );
-
-      formData.append("broker", "tradovate");
-
-      // Minimal configs required by TradesViz
-      formData.append(
-        "configs",
-        JSON.stringify({
-          import_type: "orders",
-          trades_config: { delimiter: ",", header: 1 }
-        })
-      );
+      const fd = new FormData();
+      fd.append("file", fs.createReadStream(file.filepath), file.originalFilename);
+      fd.append("broker", "tradovate");
+      fd.append("import_type", "trades");
 
       const uploadRes = await fetch(
-        "https://api.tradesviz.com/v1/import/trades/broker/csv/",
+        "https://api.tradesviz.com/v1/import/trades/broker/",
         {
           method: "POST",
           headers: {
             Authorization: `Token ${TRADESVIZ_API_KEY}`,
-            ...formData.getHeaders(),
+            ...fd.getHeaders(),
           },
-          body: formData,
-          redirect: "manual"
+          body: fd,
+          redirect: "manual", // prevents HTML redirect loops
         }
       );
 
-      console.log("📥 Upload status:", uploadRes.status);
+      const uploadText = await uploadRes.text();
 
-      const uploadJson = await uploadRes.json().catch(async () => {
-        const text = await uploadRes.text();
-        throw new Error("TradesViz returned non-JSON: " + text);
-      });
+      let uploadJson;
+      try {
+        uploadJson = JSON.parse(uploadText);
+      } catch (e) {
+        console.error("❌ TradesViz returned non-JSON:", uploadText);
+        return res.status(500).json({ error: "TradesViz non-JSON response", raw: uploadText });
+      }
 
-      console.log("🔎 TradesViz Response:", uploadJson);
+      console.log("📥 Upload JSON:", uploadJson);
 
-      if (!uploadJson.success) {
-        return res.status(500).json({ error: uploadJson });
+      if (!uploadJson.success || !uploadJson.import_id) {
+        return res.status(500).json({
+          error: "TradesViz upload failed",
+          details: uploadJson,
+        });
       }
 
       const importId = uploadJson.import_id;
 
-      // -------------------------
-      // 2. Poll for processing completion
-      // -------------------------
-      console.log("⏳ Waiting for processing…");
+      // ----------------------------------
+      // 2) POLL FOR PROCESSING COMPLETION
+      // ----------------------------------
+      console.log("⏳ Waiting for TradesViz to process import…");
 
-      let done = false;
-      let importStatus = null;
+      let processed = false;
+      let statusJson = null;
 
       for (let i = 0; i < 15; i++) {
-        await new Promise(r => setTimeout(r, 1500));
+        await new Promise((r) => setTimeout(r, 1500));
 
         const statusRes = await fetch(
           `https://api.tradesviz.com/v1/import/trades/status/${importId}/`,
@@ -107,25 +102,26 @@ export default async function handler(req, res) {
           }
         );
 
-        const statusJson = await statusRes.json();
+        statusJson = await statusRes.json();
+        console.log(`📊 Status check #${i + 1}:`, statusJson.status);
 
         if (statusJson.status === "completed") {
-          done = true;
-          importStatus = statusJson;
+          processed = true;
           break;
         }
       }
 
-      if (!done) {
+      if (!processed) {
         return res.status(500).json({
-          error: "TradesViz processing timeout",
+          error: "TradesViz import timed out",
+          importId,
         });
       }
 
-      // -------------------------
-      // 3. Export full trades (with MAE/MFE)
-      // -------------------------
-      console.log("⬇️ Downloading processed trades…");
+      // ----------------------------------
+      // 3) DOWNLOAD DETAILED CSV EXPORT
+      // ----------------------------------
+      console.log("📥 Downloading full trade report CSV…");
 
       const exportRes = await fetch(
         "https://api.tradesviz.com/v1/export/trades/csv/",
@@ -137,33 +133,41 @@ export default async function handler(req, res) {
           },
           body: JSON.stringify({
             include_mae_mfe: true,
-            include_risk: true,
             include_positions: true,
+            include_risk: true,
             include_exits: true,
           }),
         }
       );
 
-      const csvText = await exportRes.text();
+      const exportCSV = await exportRes.text();
 
-      // Convert CSV → array of rows
-      const trades = csvText
-        .split("\n")
+      // CSV → JSON Parsing
+      const lines = exportCSV.split("\n");
+      const header = lines[0].split(",");
+
+      const rows = lines
         .slice(1)
-        .map(line => line.split(","))
-        .filter(row => row.length > 3);
+        .filter((l) => l.trim().length > 0)
+        .map((line) => {
+          const cols = line.split(",");
+          const obj = {};
+          cols.forEach((val, idx) => (obj[header[idx]] = val));
+          return obj;
+        });
+
+      console.log("✅ Parsed trades:", rows.length);
 
       return res.status(200).json({
         ok: true,
         importId,
-        trades,
+        trades: rows,
       });
-
-    } catch (e) {
-      console.error("🔥 SERVER ERROR:", e);
+    } catch (error) {
+      console.error("🔥 SERVER ERROR:", error);
       return res.status(500).json({
         error: "Server error",
-        details: e.message,
+        message: error.message,
       });
     }
   });
