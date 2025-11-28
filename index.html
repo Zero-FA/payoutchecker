@@ -1082,7 +1082,76 @@ updateInputGlow();
 render();
 });
 </script>
+<script>
+// --------------------------
+// CSV Upload / Drag & Drop
+// --------------------------
 
+document.addEventListener("DOMContentLoaded", () => {
+  const dropzone = document.getElementById("dropzone");
+  const fileInput = document.getElementById("csvInput");
+  const statusBox = document.getElementById("csvStatus");
+
+  if (!dropzone || !fileInput) return;
+
+  // Click opens file browser
+  dropzone.addEventListener("click", () => {
+    fileInput.click();
+  });
+
+  // Handle file selection from click
+  fileInput.addEventListener("change", (e) => {
+    const files = [...e.target.files];
+    handleFiles(files);
+  });
+
+  // Drag over styling
+  dropzone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropzone.style.borderColor = "#3b82f6";
+  });
+
+  dropzone.addEventListener("dragleave", () => {
+    dropzone.style.borderColor = "#1d4ed8";
+  });
+
+  // Handle drop
+  dropzone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropzone.style.borderColor = "#1d4ed8";
+
+    const files = [...e.dataTransfer.files];
+    handleFiles(files);
+  });
+
+  // Main handler
+  function handleFiles(files) {
+    if (!files.length) return;
+
+    // Filter for CSV only
+    const csvFiles = files.filter(f => f.name.toLowerCase().endsWith(".csv"));
+
+    if (csvFiles.length === 0) {
+      statusBox.innerHTML = `<span style="color:#fb7185">Invalid file type. Please upload CSV files only.</span>`;
+      return;
+    }
+
+    // Show filenames
+    let list = csvFiles.map(f => `• ${f.name}`).join("<br>");
+    statusBox.innerHTML = `
+      <div style="color:#a5b4fc">
+        ${csvFiles.length} file(s) loaded:<br>${list}
+      </div>
+      <div style="margin-top:8px;color:#93c5fd;font-size:13px;">
+        Ready for analysis (backend not connected yet).
+      </div>
+    `;
+
+    // Store globally for later backend upload
+    window.uploadedCSVFiles = csvFiles;
+  }
+});
+</script>
 <!-- TRACKING SCRIPT -->
 <script>
 (function () {
