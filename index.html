@@ -1120,8 +1120,8 @@ processBtn.addEventListener("click", async () => {
     return;
   }
 
-  const formData = new FormData();
-  formData.append("file", window.uploadedCSVFiles[0]);
+const formData = new FormData();
+formData.append("file", window.uploadedCSVFiles[0], window.uploadedCSVFiles[0].name);
 
   resultsBox.innerHTML = `<div style="color:#93c5fd;">Uploading to TradesViz…</div>`;
 
