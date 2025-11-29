@@ -524,6 +524,39 @@
     <em>Example:</em> On a 50k PA you're allowed 5 minis until your end-of-day balance exceeds the trailing threshold + $100 (10 minis after).  
     If you open 8 minis before → that breaks scaling → payout denied.
   </div>
+ <!-- Scaling Rule Dropdown -->
+<div class="help" style="margin-top:8px;">
+  <a id="scalingToggle" style="color:#60a5fa; cursor:pointer; font-size:12px;">
+    View contract scaling limits →
+  </a>
+</div>
+
+<div id="scalingList" style="display:none; margin-top:8px; font-size:12px; color:#9ca3af; line-height:1.45;">
+  <strong>Contract limits BEFORE reaching Trailing Drawdown + $100:</strong>
+  <br>25K FULL — 2 minis (20 micros)
+  <br>50K FULL — 5 minis (50 micros)
+  <br>100K FULL — 7 minis (70 micros)
+  <br>150K FULL — 8 minis (85 micros)
+  <br>250K FULL — 13 minis (135 micros)
+  <br>300K FULL — 17 minis (175 micros)
+  <br>100K STATIC — 2 minis (20 micros) (Static does not scale)
+  
+  <div style="height:8px;"></div>
+
+  <strong>Contract limits AFTER reaching Trailing Drawdown + $100:</strong>
+  <br>25K FULL — 4 minis (40 micros)
+  <br>50K FULL — 10 minis (100 micros)
+  <br>100K FULL — 14 minis (140 micros)
+  <br>150K FULL — 17 minis (170 micros)
+  <br>250K FULL — 27 minis (270 micros)
+  <br>300K FULL — 35 minis (350 micros)
+  <br>100K STATIC — 2 minis (20 micros) (Static does not scale)
+  
+  <div style="margin-top:6px; font-size:11px; color:#60a5fa;">
+    You may ONLY use full contract size after your end-of-day balance exceeds<br>
+    the trailing drawdown amount + $100. Until then, you must use HALF size.
+  </div>
+</div>
   <hr>
 
   <!-- 30% MAE Rule -->
@@ -1074,6 +1107,12 @@ render();
  <script>
 document.getElementById("corrToggle").addEventListener("click", () => {
   const list = document.getElementById("corrList");
+  list.style.display = list.style.display === "none" ? "block" : "none";
+});
+</script>
+ <script>
+document.getElementById("scalingToggle").addEventListener("click", () => {
+  const list = document.getElementById("scalingList");
   list.style.display = list.style.display === "none" ? "block" : "none";
 });
 </script>
