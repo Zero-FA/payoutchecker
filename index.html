@@ -6,6 +6,26 @@
 <title>Apex PA Payout Checker</title>
 <link rel="icon" href="data:,">
 <style>
+ .dropdown-toggle {
+  color:#38bdf8 !important;       /* brighter blue */
+  font-weight:600;
+  cursor:pointer;
+  font-size:13px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+
+.dropdown-toggle:hover {
+  text-decoration:underline;
+  filter:brightness(1.2);
+}
+
+.dropdown-arrow {
+  font-size:13px;
+  color:#38bdf8;
+  font-weight:700;
+}
  /* --- Bigger, more affiliate-focused top banner --- */
 .top-bar-boost {
   background:rgba(30,64,175,.25);
@@ -567,9 +587,10 @@
 
     <!-- Scaling dropdown -->
     <div class="help" style="margin-top:8px;">
-      <a id="scalingToggle" style="color:#60a5fa; cursor:pointer; font-size:12px;">
-        ▼ View contract scaling limits
-      </a>
+<a id="scalingToggle" class="dropdown-toggle">
+  <span class="dropdown-arrow">▼</span>
+  View contract scaling limits
+</a>
     </div>
 
     <div id="scalingList" style="display:none; margin-top:8px; font-size:12px; color:#9ca3af; line-height:1.45; border-left:2px solid #1d4ed8; padding-left:10px;">
@@ -667,9 +688,10 @@
 
     <!-- Hedging correlated instruments dropdown -->
     <div class="help" style="margin-top:8px;">
-      <a id="corrToggle" style="color:#60a5fa; cursor:pointer; font-size:12px;">
-        ▼ View correlated instrument groups
-      </a>
+<a id="corrToggle" class="dropdown-toggle">
+  <span class="dropdown-arrow">▼</span>
+  View correlated instrument groups
+</a>
     </div>
 
     <div id="corrList" style="display:none; margin-top:8px; font-size:12px; color:#9ca3af; line-height:1.45; border-left:2px solid #1d4ed8; padding-left:10px;">
