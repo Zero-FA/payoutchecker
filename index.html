@@ -559,16 +559,39 @@
 </div>
   <hr>
 
-  <!-- 30% MAE Rule -->
-  <div style="margin-bottom:12px;"><strong>30% Negative P&L Rule (MAE)</strong></div>
-  <div class="help">
-    Your largest winning day cannot be more than 30% of your total profit. One huge day is considered inconsistent.
-  </div>
-  <div class="help" style="margin-top:4px;color:#93c5fd;">
-    <em>Example:</em> You made $1,000 total profit. Your biggest day was $450.  
-    450 ÷ 1,000 = 45% → this fails the rule → keep trading until it's under 30%.
-  </div>
-  <hr>
+<!-- 30% Consistency Rule -->
+<div style="margin-bottom:12px;"><strong>30% Consistency Rule (Windfall Rule)</strong></div>
+<div class="help">
+  Your largest winning day cannot exceed 30% of your total accumulated profit. One oversized day indicates inconsistent trading.
+</div>
+<div class="help" style="margin-top:4px;color:#93c5fd;">
+  <em>Example:</em> Profit = $1,000 → Largest winning day must be ≤ $300.
+</div>
+<hr>
+
+ <!-- 30% MAE Rule -->
+<div style="margin-bottom:12px;"><strong>30% Negative P&L Rule — Maximum Adverse Excursion (MAE)</strong></div>
+<div class="help">
+  This rule limits how much you can lose on any individual trade. Your open negative P&L cannot exceed 30% of your start-of-day profit.
+</div>
+<div class="help" style="margin-top:4px;color:#93c5fd;">
+  <em>Example:</em> Start-of-day profit = $4,000 → MAE limit = $1,200.
+</div>
+<div class="help" style="margin-top:8px;">
+  Low/new profit accounts use 30% of the trailing threshold instead.
+</div>
+<div class="help" style="margin-top:8px;">
+  If your EOD profit grows to double the safety net, MAE becomes 50% starting next session.
+</div>
+<div class="help" style="margin-top:8px;">
+  <strong>Static accounts:</strong>  
+  Below $2,600 → MAE = $187.50.  
+  Above $2,600 → MAE = 30% of profit.
+</div>
+<div class="help" style="margin-top:4px;color:#60a5fa;">
+  Temporary spikes above the limit are allowed if corrected quickly.
+</div>
+<hr>
 
   <!-- 5:1 Risk–Reward -->
   <div style="margin-bottom:12px;"><strong>5:1 Risk–Reward Ratio Rule</strong></div>
@@ -641,7 +664,13 @@ const MAX_PAYOUT_FIRST_FIVE = {
 
 const TRADING_RULES = [
   { key:"scaling", label:"Contract Scaling Rule", fix:"Confirm you followed the Contract Scaling Rule or address any violations." },
-  { key:"mae", label:"30% Negative P&L Rule (MAE)", fix:"Confirm no single trade exceeded the 30% MAE limit." },
+
+  // NEW — Consistency Rule
+  { key:"consistency", label:"30% Consistency Rule (no winning day > 30% of total profit)", fix:"Your largest winning day must be less than 30% of total profit." },
+
+  // NEW — MAE Rule
+  { key:"mae", label:"30% MAE Rule (Maximum Adverse Excursion)", fix:"Confirm no single trade exceeded the maximum allowed negative P&L based on start-of-day profit." },
+
   { key:"risk", label:"5:1 Risk-Reward Ratio Rule", fix:"Confirm your stop loss did not exceed 5× your profit target." },
   { key:"hedge", label:"Hedging Rule", fix:"Confirm you did not hedge (long & short on the same/correlated instrument)." },
   { key:"direction", label:"One Direction Rule", fix:"Confirm you did not have conflicting long & short positions or orders." }
@@ -649,6 +678,7 @@ const TRADING_RULES = [
 
 const RULE_LINKS = {
   scaling: "https://support.apextraderfunding.com/hc/en-us/articles/40463165052955-Contract-Scaling-Rule",
+  consistency: "https://support.apextraderfunding.com/hc/en-us/articles/40463232267035-30-Negative-P-L-Rule-Maximum-Adverse-Excursion-MAE",
   mae: "https://support.apextraderfunding.com/hc/en-us/articles/40463232267035-30-Negative-P-L-Rule-Maximum-Adverse-Excursion-MAE",
   risk: "https://support.apextraderfunding.com/hc/en-us/articles/40463462503067-5-1-Risk-Reward-Ratio-Rule",
   hedge: "https://support.apextraderfunding.com/hc/en-us/articles/40463541656603-Hedging-and-Correlated-Instruments-Rule",
@@ -908,13 +938,14 @@ const requiredInputs = [
     "payoutStatus"
   ];
 
-  const requiredCheckboxes = [
+const requiredCheckboxes = [
     "rule_scaling",
+    "rule_consistency",
     "rule_mae",
     "rule_risk",
     "rule_hedge",
     "rule_direction"
-  ];
+];
 
 // Text inputs (all must be filled; "0" counts as filled)
 requiredInputs.forEach(id => {
