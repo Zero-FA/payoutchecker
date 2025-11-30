@@ -835,14 +835,14 @@ function evaluate(inputs){
         : inputs.currentBalance >= mustHave;
   }
 
-  const paActive = inputs.paStatus === "Active";
-
+const paActive = inputs.paStatus === "Active";
+const paStatusSelected = inputs.paStatus !== "";
   const reasons = [
-    {
-      pass: paActive,
-      label: "Performance Account is active",
-      detail: paActive ? "Account is in good standing." : `Status: ${inputs.paStatus}`
-    },
+{
+  pass: paStatusSelected,
+  label: "PA Status selected",
+  detail: paStatusSelected ? "" : "Please select the PA status."
+},
     {
       pass: eightDaysPass,
       label: "≥ 8 trading days since last APPROVED payout (or start)",
@@ -995,8 +995,8 @@ function getInputs(){
   const payoutNumber = Math.max(1, (approvedCount || 0) + 1);
 
   return {
-    paStatus: fields.paStatus?.value || "Active",
-    account: fields.account?.value || "50k",
+paStatus: fields.paStatus?.value || "",
+   account: fields.account?.value || "50k",
     payoutNumber,
     currentBalance: num(fields.currentBalance?.value),
     highestProfitDaySinceRef: num(fields.highestProfitDay?.value),
