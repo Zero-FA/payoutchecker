@@ -1173,6 +1173,11 @@ document.querySelectorAll("input, select").forEach(el =>
     render();
   })
 );
+ // PA Status dropdown needs a change listener (not just input)
+fields.paStatus.addEventListener("change", () => {
+  updateInputGlow();
+  render();
+});
 
 // Auto-adjust Last Payout Status options based on Approved Payouts count
 fields.approvedCount.addEventListener("input", () => {
