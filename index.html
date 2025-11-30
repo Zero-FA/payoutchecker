@@ -598,16 +598,22 @@
 
     <hr />
 
-    <!-- ================= Consistency Rule ================= -->
-    <div style="margin-bottom:12px;"><strong>30% Consistency Rule (Windfall Rule) — Automatically Checked</strong></div>
-    <div class="help">
-      Your largest winning day cannot exceed 30% of your total profit.
-    </div>
-    <div class="help" style="margin-top:4px;color:#93c5fd;">
-      <em>Example:</em> Profit: $1,000 → largest day must be ≤ $300.
-    </div>
+<!-- ================= Consistency Rule ================= -->
+<div style="margin-bottom:12px;"><strong>30% Consistency Rule (Windfall Rule) — Automatically Checked</strong></div>
 
-    <hr />
+<div class="help">
+  Your largest winning day cannot exceed <strong>30% of your total accumulated profit</strong>. This prevents payouts
+  based on one oversized day instead of consistent performance.
+</div>
+
+<div class="help" style="margin-top:4px;color:#93c5fd;">
+  <em>Example:</em><br>
+  Total profit: $1,000 → max allowed winning day = $300<br>
+  Largest winning day = $450 → <strong>Fails</strong><br>
+  Largest winning day = $250 → <strong>Passes</strong>
+</div>
+
+<hr />
 
     <!-- ================= MAE Rule ================= -->
     <div style="margin-bottom:12px;"><strong>30% Negative P&L Rule (Maximum Adverse Excursion)</strong></div>
@@ -633,17 +639,22 @@
 
     <hr />
 
-    <!-- ================= Risk:Reward ================= -->
-    <div style="margin-bottom:12px;"><strong>5:1 Risk–Reward Ratio Rule</strong></div>
-    <div class="help">
-      Stops cannot massively exceed profit targets.
-    </div>
-    <div class="help" style="margin-top:4px;color:#93c5fd;">
-      <em>Example:</em> Target $100, stop $700 → ❌ fails  
-      Target $100, stop $500 → ✔ passes
-    </div>
+<!-- ================= Risk:Reward ================= -->
+<div style="margin-bottom:12px;"><strong>5:1 Risk–Reward Ratio Rule</strong></div>
 
-    <hr />
+<div class="help">
+  Your stop loss cannot be significantly larger than your profit target. Apex requires that your stop be no more than
+  <strong>5 times</strong> your target.
+</div>
+
+<div class="help" style="margin-top:4px;color:#93c5fd;">
+  <em>Examples:</em><br>
+  Target $100, Stop $700 → 7× target → <strong>Fails</strong><br>
+  Target $100, Stop $500 → 5× target → <strong>Passes</strong><br>
+  Target $200, Stop $900 → 4.5× target → <strong>Passes</strong>
+</div>
+
+<hr />
 
     <!-- ================= Hedging ================= -->
     <div style="margin-bottom:12px;"><strong>Hedging Rule</strong></div>
@@ -676,14 +687,20 @@
 
     <hr />
 
-    <!-- ================= One Direction ================= -->
-    <div style="margin-bottom:12px;"><strong>One Direction Rule</strong></div>
-    <div class="help">
-      All positions AND pending orders must match your direction.
-    </div>
-    <div class="help" style="margin-top:4px;color:#93c5fd;">
-      <em>Example:</em> Long ES + a sell-limit order above market → short order → violation.
-    </div>
+<!-- ================= One Direction ================= -->
+<div style="margin-bottom:12px;"><strong>One Direction Rule</strong></div>
+
+<div class="help">
+  All active positions and all pending orders must point in the same direction. Any pending order that would open a
+  position in the opposite direction is a violation.
+</div>
+
+<div class="help" style="margin-top:4px;color:#93c5fd;">
+  <em>Examples:</em><br>
+  Long ES + Sell-limit order above the market → short entry → <strong>Violation</strong><br>
+  Long ES + Buy-limit order below the market → same direction → <strong>Allowed</strong><br>
+  Short NQ + Buy-stop above the market → long entry → <strong>Violation</strong>
+</div>
 
   </div> <!-- end body -->
 </div>
