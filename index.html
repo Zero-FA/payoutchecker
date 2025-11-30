@@ -713,30 +713,32 @@
 <div style="margin-bottom:12px;"><strong>One Direction Rule</strong></div>
 
 <div class="help">
-  All active positions and all pending orders must be on the <strong>same side</strong> of the market.
-  Apex does not allow mixed buy-side and sell-side orders on the same (or correlated) product at the same time.
+  All open positions and all working orders must stay on the <strong>same side</strong> of the market.
+  Apex reviews orders by their type (BUY or SELL), not by intent (entry vs exit).
 </div>
 
 <div class="help" style="margin-top:6px;">
-  Use only <strong>buy-side orders together</strong> when you are long, and only <strong>sell-side orders together</strong> when you are short.
-</div>
-
-<div class="help" style="margin-top:6px;color:#93c5fd;">
-  <em>Allowed examples:</em><br>
-  • <strong>Long ES</strong> + buy-limit (add long) + buy-stop (protect long)<br>
-  • <strong>Short NQ</strong> + sell-limit (add short) + sell-stop (protect short)
-</div>
-
-<div class="help" style="margin-top:6px;color:#93c5fd;">
-  <em>Violation examples:</em><br>
-  • Long ES + any sell order (sell-limit / sell-stop / sell-stop-limit)<br>
-  • Short NQ + any buy order (buy-limit / buy-stop / buy-stop-limit)
+  <strong>If you are LONG:</strong><br>
+  Allowed: Buy orders (add long), Sell orders that close long (sell-limit / sell-stop)<br>
+  Not allowed: Any sell order that Apex interprets as opening a short.
 </div>
 
 <div class="help" style="margin-top:6px;">
-  If an order is a <strong>buy</strong>, Apex treats it as long.  
-  If an order is a <strong>sell</strong>, Apex treats it as short.  
-  Keep all orders on the <strong>same side</strong> to avoid violations.
+  <strong>If you are SHORT:</strong><br>
+  Allowed: Sell orders (add short), Buy orders that close short (buy-limit / buy-stop)<br>
+  Not allowed: Any buy order Apex interprets as opening a long.
+</div>
+
+<div class="help" style="margin-top:6px;color:#93c5fd;">
+  <em>Examples:</em><br>
+  • Long ES + buy-limit (add long) + sell-stop (stop-loss) → Same direction → <strong>Allowed</strong><br>
+  • Short NQ + sell-limit (add short) + buy-stop (stop-loss) → Same direction → <strong>Allowed</strong><br>
+  • Long ES + sell-limit ABOVE market (acts as a short entry) → <strong>Violation</strong><br>
+  • Short NQ + buy-limit BELOW market (acts as a long entry) → <strong>Violation</strong>
+</div>
+
+<div class="help" style="margin-top:6px;">
+  Orders that can <strong>reverse direction</strong> (not close your position) cause violations.
 </div>
 
   </div> <!-- end body -->
