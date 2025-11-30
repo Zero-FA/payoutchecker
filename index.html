@@ -665,9 +665,6 @@ const MAX_PAYOUT_FIRST_FIVE = {
 const TRADING_RULES = [
   { key:"scaling", label:"Contract Scaling Rule", fix:"Confirm you followed the Contract Scaling Rule or address any violations." },
 
-  // NEW — Consistency Rule
-  { key:"consistency", label:"30% Consistency Rule (no winning day > 30% of total profit)", fix:"Your largest winning day must be less than 30% of total profit." },
-
   // NEW — MAE Rule
   { key:"mae", label:"30% MAE Rule (Maximum Adverse Excursion)", fix:"Confirm no single trade exceeded the maximum allowed negative P&L based on start-of-day profit." },
 
@@ -678,7 +675,6 @@ const TRADING_RULES = [
 
 const RULE_LINKS = {
   scaling: "https://support.apextraderfunding.com/hc/en-us/articles/40463165052955-Contract-Scaling-Rule",
-  consistency: "https://support.apextraderfunding.com/hc/en-us/articles/40463232267035-30-Negative-P-L-Rule-Maximum-Adverse-Excursion-MAE",
   mae: "https://support.apextraderfunding.com/hc/en-us/articles/40463232267035-30-Negative-P-L-Rule-Maximum-Adverse-Excursion-MAE",
   risk: "https://support.apextraderfunding.com/hc/en-us/articles/40463462503067-5-1-Risk-Reward-Ratio-Rule",
   hedge: "https://support.apextraderfunding.com/hc/en-us/articles/40463541656603-Hedging-and-Correlated-Instruments-Rule",
@@ -940,7 +936,6 @@ const requiredInputs = [
 
 const requiredCheckboxes = [
     "rule_scaling",
-    "rule_consistency",
     "rule_mae",
     "rule_risk",
     "rule_hedge",
