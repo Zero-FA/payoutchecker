@@ -713,15 +713,30 @@
 <div style="margin-bottom:12px;"><strong>One Direction Rule</strong></div>
 
 <div class="help">
-  All active positions and all pending orders must point in the same direction. Any pending order that would open a
-  position in the opposite direction is a violation.
+  All active positions and all pending orders must be on the <strong>same side</strong> of the market.
+  Apex does not allow mixed buy-side and sell-side orders on the same (or correlated) product at the same time.
 </div>
 
-<div class="help" style="margin-top:4px;color:#93c5fd;">
-  <em>Examples:</em><br>
-  Long ES + Sell-limit order above the market → short entry → <strong>Violation</strong><br>
-  Long ES + Buy-limit order below the market → same direction → <strong>Allowed</strong><br>
-  Short NQ + Buy-stop above the market → long entry → <strong>Violation</strong>
+<div class="help" style="margin-top:6px;">
+  Use only <strong>buy-side orders together</strong> when you are long, and only <strong>sell-side orders together</strong> when you are short.
+</div>
+
+<div class="help" style="margin-top:6px;color:#93c5fd;">
+  <em>Allowed examples:</em><br>
+  • <strong>Long ES</strong> + buy-limit (add long) + buy-stop (protect long)<br>
+  • <strong>Short NQ</strong> + sell-limit (add short) + sell-stop (protect short)
+</div>
+
+<div class="help" style="margin-top:6px;color:#93c5fd;">
+  <em>Violation examples:</em><br>
+  • Long ES + any sell order (sell-limit / sell-stop / sell-stop-limit)<br>
+  • Short NQ + any buy order (buy-limit / buy-stop / buy-stop-limit)
+</div>
+
+<div class="help" style="margin-top:6px;">
+  If an order is a <strong>buy</strong>, Apex treats it as long.  
+  If an order is a <strong>sell</strong>, Apex treats it as short.  
+  Keep all orders on the <strong>same side</strong> to avoid violations.
 </div>
 
   </div> <!-- end body -->
