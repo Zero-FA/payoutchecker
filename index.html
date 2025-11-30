@@ -710,32 +710,22 @@
     <hr />
 
 <!-- ================= One Direction ================= -->
-<div style="margin-bottom:12px;"><strong>One Direction Rule</strong></div>
-
 <div class="help">
-  Apex requires that you trade in only one direction at a time on a given product (or correlated products).
-  You cannot have open positions or working orders that could open a trade in the opposite direction.
+  Apex requires you to trade in one direction at a time. You can be long or short, but not both.
+  You also cannot use a strategy that places active orders on both sides of the market at the same time.
 </div>
 
 <div class="help" style="margin-top:6px;">
-  Exit orders (profit targets and stop-losses) are allowed. The restriction applies only to orders that
-  would <strong>open</strong> a new position in the opposite direction of your current trade.
+  Exit orders (profit targets and stop-losses) are allowed. The rule refers to strategies that
+  try to work both sides of the market at once.
 </div>
 
 <div class="help" style="margin-top:6px;color:#93c5fd;">
-  <em>Allowed examples:</em><br>
-  • Long ES → using sell-limit or sell-stop to close the long<br>
-  • Short NQ → using buy-limit or buy-stop to close the short
-</div>
-
-<div class="help" style="margin-top:6px;color:#93c5fd;">
-  <em>Violation examples:</em><br>
-  • Long ES + a sell order ABOVE market meant to open a short<br>
-  • Short NQ + a buy order BELOW market meant to open a long
-</div>
-
-<div class="help" style="margin-top:6px;">
-  As long as your working orders cannot open a position in the opposite direction, you are within the rule.
+  <em>Examples:</em><br>
+  • Long ES → using sell orders to close the long = <strong>Allowed</strong><br>
+  • Short NQ → using buy orders to close the short = <strong>Allowed</strong><br>
+  • Long ES + Short MES at the same time = <strong>Not allowed</strong><br>
+  • Having active buy and sell entry orders on the same market = <strong>Not allowed</strong>
 </div>
 
   </div> <!-- end body -->
