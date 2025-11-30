@@ -839,9 +839,20 @@ const paActive = inputs.paStatus === "Active";
 const paStatusSelected = inputs.paStatus !== "";
   const reasons = [
 {
-  pass: paStatusSelected,
-  label: "PA Status selected",
-  detail: paStatusSelected ? "" : "Please select the PA status."
+  pass: inputs.paStatus === "Active",
+  label: "Performance Account is active",
+  detail:
+    inputs.paStatus === "Active"
+      ? "Account is in good standing."
+      : inputs.paStatus === ""
+        ? "Status: Not selected — please choose the PA status."
+        : inputs.paStatus === "Account Blown"
+          ? "Status: Account Blown — this account is not eligible for payout."
+          : inputs.paStatus === "Failed Rebill"
+            ? "Status: Failed Rebill — this account is not eligible for payout."
+            : inputs.paStatus === "Invoice Cancelled"
+              ? "Status: Invoice Cancelled — this account is not eligible for payout."
+              : `Status: ${inputs.paStatus} — not eligible for payout.`
 },
     {
       pass: eightDaysPass,
