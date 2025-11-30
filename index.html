@@ -510,15 +510,51 @@
 <div class="card" style="margin-top:20px;">
 
   <!-- Header (collapsible trigger) -->
-  <div id="rulesExplainHeader" class="accordion-header">
-    <div class="accordion-title" style="font-size:15px;">
+<div id="rulesExplainHeader" class="accordion-header"
+     style="
+       background:rgba(30,64,175,0.18);
+       padding:12px 14px;
+       border-radius:12px;
+       border:1px solid rgba(96,165,250,0.35);
+       display:flex;
+       justify-content:space-between;
+       align-items:center;
+       cursor:pointer;
+       transition:.2s;
+     "
+     onmouseover="this.style.background='rgba(30,64,175,0.28)'"
+     onmouseout="this.style.background='rgba(30,64,175,0.18)'"
+>
+  <div style="display:flex;flex-direction:column;">
+    <div class="accordion-title" style="font-size:15px;font-weight:700;">
       Simple Explanations of Compliance Rules
     </div>
-    <div style="display:flex;align-items:center;gap:6px;">
-      <span class="help" style="font-size:10px;margin-top:0;">Click to expand</span>
-      <span id="rulesExplainIcon" class="accordion-icon">▶</span>
+
+    <!-- OBVIOUS CLICK TO EXPAND -->
+    <div style="
+      margin-top:3px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:rgba(96,165,250,0.15);
+      border:1px solid rgba(96,165,250,0.45);
+      padding:3px 8px;
+      border-radius:6px;
+      color:#93c5fd;
+      font-size:11px;
+      font-weight:600;
+      width:max-content;
+    ">
+      <span style="font-size:13px;">👉</span>
+      Click to expand
     </div>
   </div>
+
+  <span id="rulesExplainIcon"
+        style="font-size:18px;color:#93c5fd;margin-left:10px;">
+    ▶
+  </span>
+</div>
 
   <!-- Collapsible content -->
   <div id="rulesExplainBody" class="accordion-body" style="margin-top:10px;">
