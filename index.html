@@ -508,142 +508,156 @@
   </div>
 </div>
 <div class="card" style="margin-top:20px;">
-  <div class="h1" style="font-size:20px;margin-bottom:8px;">
-    Simple Explanations of Compliance Rules
-  </div>
-  <div class="help" style="margin-bottom:18px;">
-    These rules are checked during payout review. Here's what they mean in plain English, with examples:
+
+  <!-- Header (collapsible trigger) -->
+  <div id="rulesExplainHeader" class="accordion-header">
+    <div class="accordion-title" style="font-size:15px;">
+      Simple Explanations of Compliance Rules
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span class="help" style="font-size:10px;margin-top:0;">Click to expand</span>
+      <span id="rulesExplainIcon" class="accordion-icon">▶</span>
+    </div>
   </div>
 
-  <!-- Contract Scaling Rule -->
-  <div style="margin-bottom:12px;"><strong>Contract Scaling Rule</strong></div>
-  <div class="help">
-    Trade only the max number of contracts allowed for your account size. Going over it results in a denied payout.
-  </div>
-  <div class="help" style="margin-top:4px;color:#93c5fd;">
-    <em>Example:</em> On a 50k PA you're allowed 5 minis until your end-of-day balance exceeds the trailing threshold + $100 (10 minis after).  
-    If you open 8 minis before → that breaks scaling → payout denied.
-  </div>
- <!-- Scaling Rule Dropdown -->
-<div class="help" style="margin-top:8px;">
-  <a id="scalingToggle" style="color:#60a5fa; cursor:pointer; font-size:12px;">
-    View contract scaling limits →
-  </a>
-</div>
+  <!-- Collapsible content -->
+  <div id="rulesExplainBody" class="accordion-body" style="margin-top:10px;">
 
-<div id="scalingList" style="display:none; margin-top:8px; font-size:12px; color:#9ca3af; line-height:1.45;">
-  <strong>Contract limits BEFORE reaching Trailing Drawdown + $100:</strong>
-  <br>25K FULL — 2 minis (20 micros)
-  <br>50K FULL — 5 minis (50 micros)
-  <br>100K FULL — 7 minis (70 micros)
-  <br>150K FULL — 8 minis (85 micros)
-  <br>250K FULL — 13 minis (135 micros)
-  <br>300K FULL — 17 minis (175 micros)
-  <br>100K STATIC — 2 minis (20 micros) (Static does not scale)
-  
-  <div style="height:8px;"></div>
+    <div class="help" style="margin-bottom:18px;">
+      These are the trading-behavior rules Apex checks during payout review. This is the simplified version.
+    </div>
 
-  <strong>Contract limits AFTER reaching Trailing Drawdown + $100:</strong>
-  <br>25K FULL — 4 minis (40 micros)
-  <br>50K FULL — 10 minis (100 micros)
-  <br>100K FULL — 14 minis (140 micros)
-  <br>150K FULL — 17 minis (170 micros)
-  <br>250K FULL — 27 minis (270 micros)
-  <br>300K FULL — 35 minis (350 micros)
-  <br>100K STATIC — 2 minis (20 micros) (Static does not scale)
-  
-  <div style="margin-top:6px; font-size:11px; color:#60a5fa;">
-    You may ONLY use full contract size after your end-of-day balance exceeds<br>
-    the trailing drawdown amount + $100. Until then, you must use HALF size.
-  </div>
-</div>
-  <hr>
+    <!-- ================= Contract Scaling Rule ================= -->
+    <div style="margin-bottom:12px;"><strong>Contract Scaling Rule</strong></div>
+    <div class="help">
+      Trade only within the contract limits for your account size. Exceeding the limit results in denial.
+    </div>
+    <div class="help" style="margin-top:4px;color:#93c5fd;">
+      <em>Example:</em> On a 50k PA you're allowed 5 minis until passing trailing DD + $100.  
+      Using 8 minis before qualifying → scaling violation → payout denied.
+    </div>
 
-<!-- 30% Consistency Rule -->
-<div style="margin-bottom:12px;"><strong>30% Consistency Rule (Windfall Rule)</strong></div>
-<div class="help">
-  Your largest winning day cannot exceed 30% of your total accumulated profit. One oversized day indicates inconsistent trading.
-</div>
-<div class="help" style="margin-top:4px;color:#93c5fd;">
-  <em>Example:</em> Profit = $1,000 → Largest winning day must be ≤ $300.
-</div>
-<hr>
+    <!-- Scaling dropdown -->
+    <div class="help" style="margin-top:8px;">
+      <a id="scalingToggle" style="color:#60a5fa; cursor:pointer; font-size:12px;">
+        ▼ View contract scaling limits
+      </a>
+    </div>
 
- <!-- 30% MAE Rule -->
-<div style="margin-bottom:12px;"><strong>30% Negative P&L Rule — Maximum Adverse Excursion (MAE)</strong></div>
-<div class="help">
-  This rule limits how much you can lose on any individual trade. Your open negative P&L cannot exceed 30% of your start-of-day profit.
-</div>
-<div class="help" style="margin-top:4px;color:#93c5fd;">
-  <em>Example:</em> Start-of-day profit = $4,000 → MAE limit = $1,200.
-</div>
-<div class="help" style="margin-top:8px;">
-  Low/new profit accounts use 30% of the trailing threshold instead.
-</div>
-<div class="help" style="margin-top:8px;">
-  If your EOD profit grows to double the safety net, MAE becomes 50% starting next session.
-</div>
-<div class="help" style="margin-top:8px;">
-  <strong>Static accounts:</strong>  
-  Below $2,600 → MAE = $187.50.  
-  Above $2,600 → MAE = 30% of profit.
-</div>
-<div class="help" style="margin-top:4px;color:#60a5fa;">
-  Temporary spikes above the limit are allowed if corrected quickly.
-</div>
-<hr>
+    <div id="scalingList" style="display:none; margin-top:8px; font-size:12px; color:#9ca3af; line-height:1.45; border-left:2px solid #1d4ed8; padding-left:10px;">
+      <strong>BEFORE reaching Trailing DD + $100:</strong><br>
+      25k — 2 minis<br>
+      50k — 5 minis<br>
+      100k — 7 minis<br>
+      150k — 8 minis<br>
+      250k — 13 minis<br>
+      300k — 17 minis<br>
+      100k Static — 2 minis (no scaling)<br><br>
 
-  <!-- 5:1 Risk–Reward -->
-  <div style="margin-bottom:12px;"><strong>5:1 Risk–Reward Ratio Rule</strong></div>
-  <div class="help">
-    Your stop loss cannot be way bigger than your profit target. Oversized losses violate the rule.
-  </div>
-  <div class="help" style="margin-top:4px;color:#93c5fd;">
-    <em>Example:</em> If your take-profit is $100, your stop cannot be $700.  
-    That's a 1:7 ratio → fails.  
-    A $500 stop with a $100 target (5:1) → passes.
-  </div>
-  <hr>
+      <strong>AFTER reaching Trailing DD + $100:</strong><br>
+      25k — 4 minis<br>
+      50k — 10 minis<br>
+      100k — 14 minis<br>
+      150k — 17 minis<br>
+      250k — 27 minis<br>
+      300k — 35 minis<br>
+      100k Static — 2 minis<br>
 
-  <!-- Hedging Rule -->
-  <div style="margin-bottom:12px;"><strong>Hedging Rule</strong></div>
-  <div class="help">
-    You cannot be long and short at the same time on the same or correlated markets (like ES/MES). No offsetting trades.
-  </div>
-  <div class="help" style="margin-top:4px;color:#93c5fd;">
-    <em>Example:</em> Long ES + Short MES at the same time = hedging → rule break.  
-    Long ES + Long MES at the same time = okay.
-  </div>
- <!-- Correlated Instrument Groups (Compact Toggle) -->
-<div class="help" style="margin-top:8px;">
-  <a id="corrToggle" style="color:#60a5fa; cursor:pointer; font-size:12px;">
-    View correlated instrument groups →
-  </a>
-</div>
+      <div style="margin-top:6px; font-size:11px; color:#60a5fa;">
+        Full contract size only allowed after passing trailing DD + $100.
+      </div>
+    </div>
 
-<div id="corrList" style="display:none; margin-top:8px; font-size:12px; color:#9ca3af; line-height:1.45;">
-  <strong>U.S. Indices:</strong> ES, NQ, YM, RTY, EMD, MES, MNQ, MYM, M2K<br>
-  <strong>European Indices:</strong> FDAX, FDXM, FESX, FXXP, FDXS, FSXE<br>
-  <strong>Metals:</strong> GC, SI, HG, PL, PA, QO, QI, MGC<br>
-  <strong>Energy:</strong> CL, QM, MCL, RB, HO, NG, QG<br>
-  <strong>Currencies:</strong> 6A, 6B, 6C, 6E, 6J, 6S, 6N, M6A, M6E<br>
-  <strong>Crypto:</strong> MBT, MET<br>
-  <strong>Euro Bonds:</strong> FGBL, FGBM, FGBS, FGBX<br>
-  <div style="margin-top:6px; font-size:11px; color:#60a5fa;">
-    If two instruments are in the same group, do NOT long one and short the other.
-  </div>
-</div>
-  <hr>
+    <hr />
 
-  <!-- One Direction Rule -->
-  <div style="margin-bottom:12px;"><strong>One Direction Rule</strong></div>
-  <div class="help">
-    All positions and working orders must be in the same direction. If you're long, your pending orders must also be long.
-  </div>
-  <div class="help" style="margin-top:4px;color:#93c5fd;">
-    <em>Example:</em> You are long ES, but you have a working sell limit order above the market.  
-    That’s a short order → violates the rule → payout will be denied.
-  </div>
+    <!-- ================= Consistency Rule ================= -->
+    <div style="margin-bottom:12px;"><strong>30% Consistency Rule (Windfall Rule) — Automatically Checked</strong></div>
+    <div class="help">
+      Your largest winning day cannot exceed 30% of your total profit.
+    </div>
+    <div class="help" style="margin-top:4px;color:#93c5fd;">
+      <em>Example:</em> Profit: $1,000 → largest day must be ≤ $300.
+    </div>
+
+    <hr />
+
+    <!-- ================= MAE Rule ================= -->
+    <div style="margin-bottom:12px;"><strong>30% Negative P&L Rule (Maximum Adverse Excursion)</strong></div>
+    <div class="help">
+      No trade may exceed 30% of start-of-day profit in open negative P&L.
+    </div>
+
+    <div class="help" style="margin-top:4px;color:#93c5fd;">
+      <em>Example:</em> Start-of-day profit: $4,000 → MAE limit = $1,200.
+    </div>
+
+    <div class="help" style="margin-top:8px;">
+      Low/new profit accounts use 30% of the trailing threshold.
+    </div>
+    <div class="help" style="margin-top:8px;">
+      If EOD profit > 2× safety net → MAE becomes 50% next session.
+    </div>
+    <div class="help" style="margin-top:8px;">
+      <strong>Static:</strong>  
+      Below $2,600 → MAE = $187.50.  
+      Above $2,600 → MAE = 30%.
+    </div>
+
+    <hr />
+
+    <!-- ================= Risk:Reward ================= -->
+    <div style="margin-bottom:12px;"><strong>5:1 Risk–Reward Ratio Rule</strong></div>
+    <div class="help">
+      Stops cannot massively exceed profit targets.
+    </div>
+    <div class="help" style="margin-top:4px;color:#93c5fd;">
+      <em>Example:</em> Target $100, stop $700 → ❌ fails  
+      Target $100, stop $500 → ✔ passes
+    </div>
+
+    <hr />
+
+    <!-- ================= Hedging ================= -->
+    <div style="margin-bottom:12px;"><strong>Hedging Rule</strong></div>
+    <div class="help">
+      You cannot be long and short at the same time on the same or correlated markets.
+    </div>
+    <div class="help" style="margin-top:4px;color:#93c5fd;">
+      <em>Example:</em> Long ES + Short MES → hedging → violation.
+    </div>
+
+    <!-- Hedging correlated instruments dropdown -->
+    <div class="help" style="margin-top:8px;">
+      <a id="corrToggle" style="color:#60a5fa; cursor:pointer; font-size:12px;">
+        ▼ View correlated instrument groups
+      </a>
+    </div>
+
+    <div id="corrList" style="display:none; margin-top:8px; font-size:12px; color:#9ca3af; line-height:1.45; border-left:2px solid #1d4ed8; padding-left:10px;">
+      <strong>U.S. Indices:</strong> ES, NQ, YM, RTY, EMD, MES, MNQ, MYM, M2K<br>
+      <strong>Metals:</strong> GC, SI, HG, etc.<br>
+      <strong>Energy:</strong> CL, QM, RB, NG, etc.<br>
+      <strong>Currencies:</strong> 6A, 6B, 6E, etc.<br>
+      <strong>Crypto:</strong> MBT, MET<br>
+      <strong>Euro Bonds:</strong> FGBL, FGBM, FGBX<br>
+
+      <div style="margin-top:6px; font-size:11px; color:#60a5fa;">
+        If two instruments are in the same group, do NOT long one and short the other.
+      </div>
+    </div>
+
+    <hr />
+
+    <!-- ================= One Direction ================= -->
+    <div style="margin-bottom:12px;"><strong>One Direction Rule</strong></div>
+    <div class="help">
+      All positions AND pending orders must match your direction.
+    </div>
+    <div class="help" style="margin-top:4px;color:#93c5fd;">
+      <em>Example:</em> Long ES + a sell-limit order above market → short order → violation.
+    </div>
+
+  </div> <!-- end body -->
 </div>
 
 <script>
@@ -1129,6 +1143,16 @@ updateInputGlow();
 render();
 
 }); // DOMContentLoaded
+ // Full compliance rules accordion
+const rulesExplainHeader = document.getElementById("rulesExplainHeader");
+const rulesExplainBody = document.getElementById("rulesExplainBody");
+const rulesExplainIcon = document.getElementById("rulesExplainIcon");
+
+rulesExplainHeader.addEventListener("click", () => {
+  const isOpen = rulesExplainBody.style.display === "block";
+  rulesExplainBody.style.display = isOpen ? "none" : "block";
+  rulesExplainIcon.textContent = isOpen ? "▶" : "▼";
+});
 </script>
  <script>
 document.getElementById("corrToggle").addEventListener("click", () => {
