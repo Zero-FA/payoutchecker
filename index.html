@@ -107,14 +107,13 @@
     padding:3px 8px;
     border-radius:999px;
     font-size:11px;
-    color:var(--good);
     background:rgba(22,163,74,.12);
     border:1px solid rgba(34,197,94,.5);
   }
   .pill-bad{
     background:rgba(248,113,113,.12);
     border-color:rgba(248,113,113,.7);
-    color:var(--bad);
+    color:#fecaca;
   }
   .pill span.dot{
     width:6px;height:6px;border-radius:999px;
@@ -406,7 +405,7 @@
           </div>
         </div>
         <div style="font-size:14px;color:var(--muted);margin-bottom:6px;">
-Below are the rules that must be followed for a payout to be approved. Check each box to complete the section.        </div>
+Below are the rules that must be followed for a payout to be approved. Click each checkbox to complete the section.     </div>
         <ul id="rulesList" class="list rules-grid"></ul>
       </div>
 
@@ -882,14 +881,6 @@ function evaluate(inputs){
         ? false
         : (inputs.highestProfitDaySinceRef / totalProfit) <= 0.3);
 
-  // Windfall targets
-  const windfallMinTotalProfit = Math.ceil(inputs.highestProfitDaySinceRef / 0.3);
-  const windfallMinBalance = baseline + windfallMinTotalProfit;
-  const safetyNetMinTotalProfit = Math.max(0, minBalanceToRequest - baseline);
-  const safetyNetMinBalance = baseline + safetyNetMinTotalProfit;
-  const combinedMinTotalProfit = Math.max(windfallMinTotalProfit, safetyNetMinTotalProfit);
-  const combinedMinBalance = baseline + combinedMinTotalProfit;
-
   const eightDaysPass = inputs.tradingDaysSinceRef >= 8;
   const fiveDays50Pass = inputs.profitableDaysOver50SinceRef >= 5;
 
@@ -984,16 +975,7 @@ const paStatusSelected = inputs.paStatus !== "";
   if (!eightDaysPass) advice.push("Trade more days until you hit 8 since the last approved payout.");
   if (!fiveDays50Pass) advice.push("You need at least 5 days with ≥ $50 profit in the same period.");
   if (windfallRuleApplies && !reasons[3].pass){
-    advice.push(() => {
-      const parts = [];
-      parts.push(`Your highest day ($${fmt(inputs.highestProfitDaySinceRef)}) is >30% of total profit ($${fmt(totalProfit)}).`);
-      parts.push(`To satisfy the 30% rule, total profit must be at least $${fmt(windfallMinTotalProfit)} (balance ≥ $${fmt(windfallMinBalance)}).`);
-      if (safetyNetRequired && safetyNetMinTotalProfit > windfallMinTotalProfit) {
-        parts.push(`However, this payout also requires the safety net: balance ≥ $${fmt(minBalanceToRequest)} (total profit ≥ $${fmt(safetyNetMinTotalProfit)}).`);
-        parts.push(`Aim for total profit ≥ $${fmt(combinedMinTotalProfit)} (balance ≥ $${fmt(combinedMinBalance)}).`);
-      }
-      return parts.join(' ');
-    })());
+    advice.push(`Your highest day ($${fmt(inputs.highestProfitDaySinceRef)}) is >30% of total profit ($${fmt(totalProfit)}). Keep trading until total profit is at least $${fmt(Math.ceil(inputs.highestProfitDaySinceRef/0.3))}.`);
   }
   if (!reasons[4].pass){
     advice.push(
