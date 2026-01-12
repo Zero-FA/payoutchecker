@@ -1,0 +1,1390 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Apex PA Payout Checker</title>
+  <link rel="icon" href="data:,">
+<style>
+
+ .dropdown-toggle {
+  color:#38bdf8 !important;       /* brighter blue */
+  font-weight:600;
+  cursor:pointer;
+  font-size:13px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+
+.dropdown-toggle:hover {
+  text-decoration:underline;
+  filter:brightness(1.2);
+}
+
+.dropdown-arrow {
+  font-size:13px;
+  color:#38bdf8;
+  font-weight:700;
+}
+ .deal-size {
+  text-shadow: 0 0 12px rgba(96,165,250,.65);
+  font-size: 30px;
+  font-weight: 900;
+  background: linear-gradient(90deg,#60a5fa,#93c5fd);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+  :root{
+    --bg:#020617;
+    --bg2:#020617;
+    --card:#020617;
+    --card-soft:#050816;
+    --ink:#e5e7eb;
+    --muted:#9ca3af;
+    --line:#111827;
+    --good:#22c55e;
+    --bad:#f97373;
+    --pill:#10b98133;
+    --accent:#60a5fa;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at top left, #1d283a 0, #020617 45%),
+      radial-gradient(circle at bottom right, #0b1120 0, #020617 55%);
+    color:var(--ink);
+    font:18px/1.5 system-ui,Segoe UI,Roboto,Helvetica,Arial;
+  }
+.wrap{
+  max-width:1120px;
+  margin:32px auto;
+  padding: 24px 16px 0;
+}
+  .h1{font-weight:800;font-size:24px;margin-bottom:4px;letter-spacing:.02em}
+  .sub{color:var(--muted);margin-bottom:4px;font-size:13px}
+  .disclaimer{color:#6b7280;font-size:11px;margin-top:2px;margin-bottom:10px}
+  .card{
+    background:rgba(15,23,42,.96);
+    border:1px solid rgba(148,163,184,.12);
+    border-radius:18px;
+    padding:16px 16px 14px;
+    box-shadow:0 18px 40px rgba(0,0,0,.45);
+  }
+  .card-soft{
+    background:rgba(15,23,42,.9);
+    border-radius:16px;
+    border:1px solid rgba(30,64,175,.5);
+    padding:12px 14px;
+  }
+  .grid{display:grid;gap:12px}
+  .cols2{grid-template-columns:1fr 1fr}
+  .label{font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em}
+  .input,.select{
+    width:100%;
+    border:1px solid #1f2937;
+    background:rgba(15,23,42,.95);
+    color:var(--ink);
+    border-radius:10px;
+    padding:8px 10px;
+    font:13px system-ui,Segoe UI,Roboto,Helvetica,Arial;
+  }
+  .input:focus,.select:focus{
+    outline:none;
+    border-color:#3b82f6;
+    box-shadow:0 0 0 1px rgba(59,130,246,.5);
+  }
+  .help{font-size:14px;color:var(--muted);margin-top:3px}
+  .row{display:flex;gap:8px;align-items:center}
+  .row-between{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .ok{color:var(--good)}
+  .bad{color:#fb7185}
+  .pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:3px 8px;
+    border-radius:999px;
+    font-size:11px;
+    background:rgba(22,163,74,.12);
+    border:1px solid rgba(34,197,94,.5);
+  }
+  .pill-bad{
+    background:rgba(248,113,113,.12);
+    border-color:rgba(248,113,113,.7);
+    color:#fecaca;
+  }
+  .pill span.dot{
+    width:6px;height:6px;border-radius:999px;
+    background:currentColor;
+  }
+ #yesno span:last-child {
+  font-size:18px;   /* change this number */
+  font-weight:700;  /* optional but looks clean */
+}
+  .tile{
+    background:#020617;
+    border:1px solid #111827;
+    border-radius:12px;
+    padding:8px 10px;
+  }
+  .tile-label{font-size:11px;color:var(--muted);margin-bottom:3px}
+  .tile-main{font-size:13px;font-weight:600}
+  .range{
+    background:rgba(6,78,59,.3);
+    border:1px solid #047857;
+    color:#a7f3d0;
+    border-radius:12px;
+    padding:9px 10px;
+  }
+  .list{list-style:none;padding:0;margin:0}
+  .list li{
+    display:flex;
+    gap:8px;
+    align-items:flex-start;
+    padding:5px 0;
+    border-bottom:1px dashed #111827;
+  }
+  .list li:last-child{border-bottom:0}
+  .mono{font:11px ui-monospace,Consolas,Menlo,monospace}
+  hr{
+    border:none;
+    border-top:1px dashed #111827;
+    margin:10px 0;
+  }
+  svg{flex:0 0 auto}
+  .tag{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    padding:2px 7px;
+    border-radius:999px;
+    border:1px solid #1d4ed8;
+    background:rgba(30,64,175,.18);
+    font-size:14px;
+    color:#bfdbfe;
+  }
+  .top-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  /* Trading rules layout */
+  .rules-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:4px 10px;
+  }
+  .rules-grid li{
+    border-bottom:none;
+    padding:2px 0;
+  }
+  .rule-main{display:flex;align-items:center;gap:6px}
+  .rule-main label{font-size:12px;font-weight:500;cursor:pointer}
+  .rule-link{
+    font-size:11px;
+    color:#60a5fa;
+    text-decoration:none;
+  }
+  .rule-link:hover{text-decoration:underline}
+  .rule-help-btn{
+  margin-left:6px;
+  width:18px;height:18px;
+  border-radius:999px;
+  border:1px solid rgba(96,165,250,.45);
+  background:rgba(96,165,250,.12);
+  color:#93c5fd;
+  font-size:12px;
+  font-weight:800;
+  line-height:16px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.rule-help-btn:hover{ filter:brightness(1.2); }
+
+.rule-state{
+  margin-left:8px;
+  font-size:10px;
+  padding:2px 6px;
+  border-radius:999px;
+  border:1px solid rgba(148,163,184,.25);
+  color:#cbd5e1;
+  background:rgba(15,23,42,.55);
+}
+.rule-state.unsure{
+  border-color: rgba(250,204,21,.35);
+  background: rgba(250,204,21,.10);
+  color:#facc15;
+}
+ 
+ /* Yellow alert badge for collapsed checklist */
+.checklist-alert {
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  font-size:11px;
+  background:rgba(255, 191, 0, 0.15);
+  border:1px solid rgba(255, 191, 0, 0.35);
+  color:#facc15;
+  padding:3px 6px;
+  border-radius:8px;
+  margin-left:6px;
+}
+
+  /* What to Fix badge */
+  .fix-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:11px;
+    color:#fecaca;
+    background:rgba(127,29,29,.55);
+    border-radius:999px;
+    padding:3px 8px;
+    border:1px solid #b91c1c;
+    margin-bottom:6px;
+  }
+
+  /* Accordion (for Eligibility Checklist) */
+  .accordion-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    cursor:pointer;
+    padding:4px 0 2px 0;
+  }
+  .accordion-title{
+    font-weight:600;
+    font-size:13px;
+  }
+  .accordion-icon{
+    font-size:12px;
+    color:var(--muted);
+    margin-left:6px;
+  }
+  .accordion-body{
+    margin-top:6px;
+    display:none; /* collapsed by default */
+  }
+
+  @media (max-width:920px){
+    .cols2{grid-template-columns:1fr}
+  }
+ /* =======================
+   INPUT COMPLETION STATES
+   ======================= */
+
+.input.required-empty,
+.select.required-empty {
+  border-color: #fb7185 !important; /* your red tone */
+  box-shadow: 0 0 8px rgba(251, 113, 133, .55);
+}
+
+.input.required-filled,
+.select.required-filled {
+  border-color: #22c55e !important; /* your green tone */
+  box-shadow: 0 0 8px rgba(34, 197, 94, .55);
+}
+ /* =======================
+   CHECKBOX COMPLETION STATES
+   ======================= */
+
+.checkbox-required-empty {
+  filter: drop-shadow(0 0 6px rgba(251, 113, 133, .65)); /* red */
+}
+
+.checkbox-required-filled {
+  filter: drop-shadow(0 0 6px rgba(34, 197, 94, .65)); /* green */
+}
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- Top header / title -->
+<div class="top-bar">
+    <div>
+      <div class="h1">Staff Payout Checker</div>
+      <div class="sub">Check your payout eligibility criteria before you submit a request.</div>
+      <div class="disclaimer">
+        This tool is unofficial and for guidance only; final decisions are made by Apex Trader Funding.
+      </div>
+    </div>
+    </div>
+
+  <!-- MAIN GRID: 2x2 layout -->
+  <div class="grid cols2" style="gap:16px; align-items:start; margin-top:10px;">
+
+    <!-- LEFT COLUMN (top: form + rules, bottom: checklist) -->
+    <div class="grid" style="gap:12px">
+
+      <!-- Form + Trading Rules in SAME CARD -->
+      <div class="card">
+        <!-- Form fields -->
+        <div class="grid cols2" style="gap:10px 12px">
+          <div>
+<div style="font-weight:400;font-size:14px;">1. PA Status</div>
+<select id="paStatus" class="select">
+  <option value="">— Select PA Status —</option>
+  <option>Active</option>
+  <option>Account Blown</option>
+  <option>Failed Rebill</option>
+  <option>Invoice Cancelled</option>
+</select>
+          </div>
+          <div>
+<div style="font-weight:400;font-size:14px;">2. Account Size</div>
+<select id="accountSize" class="select">
+  <option value="">— Select Account —</option>
+  <option value="25k">$25k</option>
+  <option value="50k">$50k</option>
+  <option value="100k">$100k</option>
+  <option value="150k">$150k</option>
+  <option value="250k">$250k</option>
+  <option value="300k">$300k</option>
+  <option value="100kStatic">$100k Static</option>
+</select>
+          </div>
+
+          <div>
+<div style="font-weight:400;font-size:14px;">3. Payout number for this request</div>
+<select id="payoutNumber" class="select">
+  <option value="">— Select payout number —</option>
+  <option value="1">1st payout</option>
+  <option value="2">2nd payout</option>
+  <option value="3">3rd payout</option>
+  <option value="4">4th payout</option>
+  <option value="5">5th payout</option>
+  <option value="6">6th payout (or higher)</option>
+</select>
+<div class="help">
+• Payouts 1-3: safety-net rules apply<br>
+• Payout 6+: 30% rule and payout caps are removed
+</div>
+          </div>
+
+        
+        </div>
+
+        <hr />
+
+        <div class="grid cols2" style="gap:10px 12px">
+          <div>
+<div style="font-weight:400;font-size:14px;">4. Current Balance ($)</div>
+            <input id="currentBalance" class="input" inputmode="decimal" placeholder="e.g., 52600" />
+          </div>
+          <div>
+<div style="font-weight:400;font-size:14px;">5. Desired Payout ($)</div>
+          <input id="desiredPayout" class="input" inputmode="decimal" placeholder="e.g., 500" />
+            <div class="help">Min $500. Caps apply for first 5 payouts.</div>
+          </div>
+
+          <div>
+<div style="font-weight:400;font-size:14px;">6. Highest Profit Day Since Last Approval</div>
+            <input id="highestProfitDay" class="input" inputmode="decimal" placeholder="e.g., 600" />
+          </div>
+          <div>
+<div style="font-weight:400;font-size:14px;">7. Trading Days Since Last Request</div>
+           <input id="daysSinceRequest" class="input" type="number" min="0" placeholder="e.g., 8" />
+          </div>
+          <div>
+<div style="font-weight:400;font-size:14px;">8. Profitable Days ≥ $50 Since Last Request</div>
+            <input id="profitableDays" class="input" type="number" min="0" placeholder="e.g., 5" />
+          </div>
+        </div>
+
+        <hr style="margin-top:12px;margin-bottom:8px;">
+
+        <!-- Trading Rule Compliance (inside same card) -->
+        <div class="row-between" style="margin-bottom:4px;">
+          <div style="font-weight:400;font-size:14px;;">9. Trading Rule Compliance (Required)</div>
+          <div class="tag">
+            <span style="width:7px;height:7px;border-radius:999px;background:#22c55e;"></span>
+            Must be TRUE for payout
+          </div>
+        </div>
+        <div style="font-size:14px;color:var(--muted);margin-bottom:6px;">
+          Confirm you followed these rules during the payout period. If not, your payout may be denied. There are simple explanations at the bottom of the page, but it's best to read the official FAQs since they go into much more detail.
+        </div>
+        <ul id="rulesList" class="list rules-grid"></ul>
+      </div>
+
+      <!-- Eligibility Checklist (accordion, bottom-left) -->
+      <div class="card">
+   <div id="checklistHeader" class="accordion-header">
+  <div class="accordion-title">Eligibility Checklist</div>
+  <span id="checklistAlert" style="display:none;"></span>
+  <div style="display:flex;align-items:center;gap:6px;">
+            <span class="help" style="margin-top:0;font-size:10px;">Click to expand</span>
+            <span id="checklistIcon" class="accordion-icon">▶</span>
+          </div>
+        </div>
+        <div class="help" style="margin-top:4px;margin-bottom:2px;">
+          This updates automatically as you fill out the form and confirm trading rules.
+        </div>
+        <div id="checklistBody" class="accordion-body">
+          <ul id="checklist" class="list" style="margin-top:4px;"></ul>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN (top: summary, bottom: what to fix) -->
+    <div class="grid" style="gap:12px">
+      <!-- Summary -->
+      <div id="summaryCard" class="card" style="border-color:#1d4ed8">
+        <div class="row-between">
+          <div class="row" style="gap:6px">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <path d="M22 4 12 14.01l-3-3"></path>
+            </svg>
+            <div>
+              <div style="font-weight:700;font-size:20px">Should this payout be approved?</div>
+              <div style="font-size:14px;color:var(--muted);">
+                Based on standard PA payout parameters and your inputs.
+              </div>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <a href="https://support.apextraderfunding.com/hc/en-us/articles/40507212951451-PA-Payout-Parameters"
+               target="_blank" rel="noopener"
+               style="font-size:11px;color:#93c5fd;text-decoration:none;">
+               View Payout Parameters →
+            </a>
+          </div>
+        </div>
+
+     <div style="display:flex;align-items:center;gap:12px;margin:6px 0 8px 0;">
+          <div id="yesno" class="pill">
+            <span class="dot"></span>
+            <span>YES</span>
+          </div>
+          <div style="font-size:14px;color:var(--muted);">
+            All conditions (including trading rules) must be met for a strong chance of approval.
+          </div>
+        </div>
+
+        <!-- Quick stats row -->
+        <div class="grid cols2" style="gap:8px 10px;margin-bottom:6px;">
+          <div class="tile">
+            <div class="tile-label">Safety net required?</div>
+            <div class="tile-main" id="safetyReq">—</div>
+            <div class="help">Safety net = drawdown + $100 → <span id="safetyAmt">—</span></div>
+          </div>
+          <div class="tile">
+            <div class="tile-label">Min balance to request</div>
+            <div class="tile-main" id="minBal">—</div>
+            <div class="help">Must remain after payout (≥4th) or be met before request (≤3rd).</div>
+          </div>
+          <div class="tile">
+            <div class="tile-label">Min payout</div>
+            <div class="tile-main" id="minPay">$500</div>
+            <div class="help">Payout requests below this will not qualify.</div>
+          </div>
+          <div class="tile">
+            <div class="tile-label">Max payout cap</div>
+            <div class="tile-main" id="maxCap">—</div>
+            <div class="help">Caps apply to first 5 payouts by account size.</div>
+          </div>
+        </div>
+
+        <div id="rangeWrap" class="range" style="margin-top:6px;display:none">
+          <div style="font-size:11px;margin-bottom:2px;">Allowed payout range</div>
+          <div id="range" style="font-weight:700;font-size:14px">$— – $—</div>
+        </div>
+      </div>
+
+      <!-- What to Fix (bottom-right) -->
+      <div id="adviceWrap" class="card-soft" style="display:none">
+        <div class="fix-badge">
+          <span style="width:8px;height:8px;border-radius:999px;background:#fecaca;"></span>
+          What you may need to fix before requesting
+        </div>
+        <ul id="adviceList" class="list"></ul>
+      </div>
+
+  </div>
+</div>
+<div class="card" style="margin-top:20px;">
+
+  <!-- Header (collapsible trigger) -->
+<div id="rulesExplainHeader" class="accordion-header"
+     style="
+       background:rgba(30,64,175,0.18);
+       padding:12px 14px;
+       border-radius:12px;
+       border:1px solid rgba(96,165,250,0.35);
+       display:flex;
+       justify-content:space-between;
+       align-items:center;
+       cursor:pointer;
+       transition:.2s;
+     "
+     onmouseover="this.style.background='rgba(30,64,175,0.28)'"
+     onmouseout="this.style.background='rgba(30,64,175,0.18)'"
+>
+  <div style="display:flex;flex-direction:column;">
+    <div class="accordion-title" style="font-size:15px;font-weight:700;">
+      Simple Explanations of Compliance Rules
+    </div>
+
+    <!-- OBVIOUS CLICK TO EXPAND -->
+    <div style="
+      margin-top:3px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:rgba(96,165,250,0.15);
+      border:1px solid rgba(96,165,250,0.45);
+      padding:3px 8px;
+      border-radius:6px;
+      color:#93c5fd;
+      font-size:11px;
+      font-weight:600;
+      width:max-content;
+    ">
+      <span style="font-size:13px;">👉</span>
+      Click to expand
+    </div>
+  </div>
+
+  <span id="rulesExplainIcon"
+        style="font-size:18px;color:#93c5fd;margin-left:10px;">
+    ▶
+  </span>
+</div>
+
+  <!-- Collapsible content -->
+  <div id="rulesExplainBody" class="accordion-body" style="margin-top:10px;">
+
+    <div class="help" style="margin-bottom:18px;">
+      These are the trading-behavior rules Apex checks during payout review. This is the simplified version.
+    </div>
+
+    <!-- ================= Contract Scaling Rule ================= -->
+    <div style="margin-bottom:12px;"><strong>Contract Scaling Rule</strong></div>
+    <div class="help">
+      Trade only within the contract limits for your account size. Exceeding the limit results in denial.
+    </div>
+    <div class="help" style="margin-top:4px;color:#93c5fd;">
+      <em>Example:</em> On a 50k PA you're allowed 5 minis until passing trailing DD + $100.  
+      Using 8 minis before qualifying → scaling violation → payout denied.
+    </div>
+
+    <!-- Scaling dropdown -->
+    <div class="help" style="margin-top:8px;">
+<a id="scalingToggle" class="dropdown-toggle">
+  <span class="dropdown-arrow">▼</span>
+  View contract scaling limits
+</a>
+    </div>
+
+    <div id="scalingList" style="display:none; margin-top:8px; font-size:12px; color:#9ca3af; line-height:1.45; border-left:2px solid #1d4ed8; padding-left:10px;">
+      <strong>BEFORE reaching Trailing DD + $100:</strong><br>
+      25k — 2 minis<br>
+      50k — 5 minis<br>
+      100k — 7 minis<br>
+      150k — 8 minis<br>
+      250k — 13 minis<br>
+      300k — 17 minis<br>
+      100k Static — 2 minis (no scaling)<br><br>
+
+      <strong>AFTER reaching Trailing DD + $100:</strong><br>
+      25k — 4 minis<br>
+      50k — 10 minis<br>
+      100k — 14 minis<br>
+      150k — 17 minis<br>
+      250k — 27 minis<br>
+      300k — 35 minis<br>
+      100k Static — 2 minis<br>
+
+      <div style="margin-top:6px; font-size:11px; color:#60a5fa;">
+        Full contract size only allowed after passing trailing DD + $100.
+      </div>
+    </div>
+
+    <hr />
+
+<!-- ================= Consistency Rule ================= -->
+<div style="margin-bottom:12px;"><strong>30% Consistency Rule (Windfall Rule) — Automatically Checked</strong></div>
+
+<div class="help">
+  Your largest winning day cannot exceed <strong>30% of your total accumulated profit</strong>. This prevents payouts
+  based on one oversized day instead of consistent performance.
+</div>
+
+<div class="help" style="margin-top:4px;color:#93c5fd;">
+  <em>Example:</em><br>
+  Total profit: $1,000 → max allowed winning day = $300<br>
+  Largest winning day = $450 → <strong>Fails</strong><br>
+  Largest winning day = $250 → <strong>Passes</strong>
+</div>
+
+<hr />
+
+    <!-- ================= MAE Rule ================= -->
+    <div style="margin-bottom:12px;"><strong>30% Negative P&L Rule (Maximum Adverse Excursion)</strong></div>
+    <div class="help">
+      No trade may exceed 30% of start-of-day profit in open negative P&L.
+    </div>
+
+    <div class="help" style="margin-top:4px;color:#93c5fd;">
+      <em>Example:</em> Start-of-day profit: $4,000 → MAE limit = $1,200.
+    </div>
+
+    <div class="help" style="margin-top:8px;">
+      Low/new profit accounts use 30% of the trailing threshold.
+    </div>
+    <div class="help" style="margin-top:8px;">
+      If EOD profit > 2× safety net → MAE becomes 50% next session.
+    </div>
+    <div class="help" style="margin-top:8px;">
+      <strong>Static:</strong>  
+      Below $2,600 → MAE = $187.50.  
+      Above $2,600 → MAE = 30%.
+    </div>
+<!-- MAE dropdown -->
+<div class="help" style="margin-top:8px;">
+  <a id="maeToggle" class="dropdown-toggle">
+    <span class="dropdown-arrow">▼</span>
+    View MAE thresholds by account size
+  </a>
+</div>
+
+<div id="maeList" style="display:none; margin-top:8px; font-size:12px; color:#9ca3af; line-height:1.45; border-left:2px solid #1d4ed8; padding-left:10px;">
+  <strong>MAE is normally 30% of start-of-day profit</strong> (or the “low/new profit” trailing-threshold-based limit).<br><br>
+
+  <strong>When it increases:</strong><br>
+  If EOD profit &gt; 2× safety net → next session MAE can become <strong>50%</strong> (per rule conditions).<br><br>
+
+  <strong>Quick reference by PA size (safety net context):</strong><br>
+  $25k — Safety net = $1,600 (2× = $3,200)<br>
+  $50k — Safety net = $2,600 (2× = $5,200)<br>
+  $100k — Safety net = $3,100 (2× = $6,200)<br>
+  $150k — Safety net = $5,100 (2× = $10,200)<br>
+  $250k — Safety net = $6,600 (2× = $13,200)<br>
+  $300k — Safety net = $7,600 (2× = $15,200)<br>
+  $100k Static — Safety net = $2,600 (2× = $5,200)<br><br>
+
+  <strong>Static special case:</strong><br>
+  Below $2,600 → MAE = $187.50<br>
+  Above $2,600 → MAE = 30%<br>
+</div>
+    <hr />
+
+<!-- ================= Risk:Reward ================= -->
+<div style="margin-bottom:12px;"><strong>5:1 Risk–Reward Ratio Rule</strong></div>
+
+<div class="help">
+  Your stop loss cannot be significantly larger than your profit target. Apex requires that your stop be no more than
+  <strong>5 times</strong> your target.
+</div>
+
+<div class="help" style="margin-top:4px;color:#93c5fd;">
+  <em>Examples:</em><br>
+  Target $100, Stop $700 → 7× target → <strong>Fails</strong><br>
+  Target $100, Stop $500 → 5× target → <strong>Passes</strong><br>
+  Target $200, Stop $900 → 4.5× target → <strong>Passes</strong>
+</div>
+
+<hr />
+
+    <!-- ================= Hedging ================= -->
+    <div style="margin-bottom:12px;"><strong>Hedging Rule</strong></div>
+    <div class="help">
+      You cannot be long and short at the same time on the same or correlated markets.
+    </div>
+    <div class="help" style="margin-top:4px;color:#93c5fd;">
+      <em>Example:</em> Long ES + Short MES → hedging → violation.
+    </div>
+
+    <!-- Hedging correlated instruments dropdown -->
+    <div class="help" style="margin-top:8px;">
+<a id="corrToggle" class="dropdown-toggle">
+  <span class="dropdown-arrow">▼</span>
+  View correlated instrument groups
+</a>
+    </div>
+
+    <div id="corrList" style="display:none; margin-top:8px; font-size:12px; color:#9ca3af; line-height:1.45; border-left:2px solid #1d4ed8; padding-left:10px;">
+      <strong>U.S. Indices:</strong> ES, NQ, YM, RTY, EMD, MES, MNQ, MYM, M2K<br>
+      <strong>Metals:</strong> GC, SI, HG, etc.<br>
+      <strong>Energy:</strong> CL, QM, RB, NG, etc.<br>
+      <strong>Currencies:</strong> 6A, 6B, 6E, etc.<br>
+      <strong>Crypto:</strong> MBT, MET<br>
+      <strong>Euro Bonds:</strong> FGBL, FGBM, FGBX<br>
+
+      <div style="margin-top:6px; font-size:11px; color:#60a5fa;">
+        If two instruments are in the same group, do NOT long one and short the other.
+      </div>
+    </div>
+
+    <hr />
+
+<!-- ================= One Direction Rule ================= -->
+<div style="margin-bottom:12px;"><strong>One Direction Rule</strong></div>
+
+<div class="help">
+  Apex requires you to trade in one direction at a time. You can be long or short, but not both at once.
+  You also cannot use a strategy that places active entry orders on both sides of the market at the same time.
+</div>
+
+<div class="help" style="margin-top:6px;">
+  Exit orders (profit targets and stop-losses) are allowed. The restriction only applies to strategies
+  that attempt to work both sides of the market simultaneously.
+</div>
+
+<div class="help" style="margin-top:6px;color:#93c5fd;">
+  <em>Examples:</em><br>
+  • Long ES → using sell orders to close the long = <strong>Allowed</strong><br>
+  • Short NQ → using buy orders to close the short = <strong>Allowed</strong><br>
+  • Long ES + Short MES at the same time = <strong>Not allowed</strong><br>
+  • Having active buy AND sell entry orders on the same market = <strong>Not allowed</strong>
+</div>
+
+  </div> <!-- end body -->
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+/* ---------- Data & Helpers ---------- */
+const ACCOUNT_CONFIG = {
+  "25k": { label:"$25k", startBalance:25000, minReqBalanceFirst3:26600 },
+  "50k": { label:"$50k", startBalance:50000, minReqBalanceFirst3:52600 },
+  "100k":{ label:"$100k", startBalance:100000, minReqBalanceFirst3:103100 },
+  "150k":{ label:"$150k", startBalance:150000, minReqBalanceFirst3:155100 },
+  "250k":{ label:"$250k", startBalance:250000, minReqBalanceFirst3:256600 },
+  "300k":{ label:"$300k", startBalance:300000, minReqBalanceFirst3:307600 },
+  "100kStatic":{ label:"$100k Static", startBalance:100000, minReqBalanceFirst3:102600 },
+};
+const MAX_PAYOUT_FIRST_FIVE = {
+  "25k":1500,"50k":2000,"100k":2500,"150k":2750,"250k":3000,"300k":3500,"100kStatic":1000
+};
+
+const TRADING_RULES = [
+  {
+    key:"scaling",
+    label:"Contract Scaling Rule",
+    fix:"Confirm you followed the Contract Scaling Rule or address any violations.",
+    help:"Do not exceed your allowed contracts for your account tier (before/after passing trailing DD + $100).",
+    how:"How to check: review your fills for the payout period and confirm your max position size never exceeded the allowed contract limit."
+  },
+  {
+    key:"mae",
+    label:"30% MAE Rule (Maximum Adverse Excursion)",
+    fix:"Confirm no single trade exceeded the maximum allowed negative P&L based on start-of-day profit.",
+    help:"During a live trade, your open negative P&L must not exceed the MAE limit (often based on start-of-day profit / trailing threshold rules).",
+    how:"How to check: in your platform’s trade history / order report, find the worst open P&L (or max adverse excursion) for the trade/day and compare to the allowed limit."
+  },
+  {
+    key:"risk",
+    label:"5:1 Risk-Reward Ratio Rule",
+    fix:"Confirm your stop loss did not exceed 5× your profit target.",
+    help:"Your stop distance cannot be more than 5x your target distance (or $ stop > 5× $ target).",
+    how:"How to check: for each strategy/template, confirm Stop / Target sizing. If you scale, verify worst-case stop still meets 5:1."
+  },
+  {
+    key:"hedge",
+    label:"Hedging Rule",
+    fix:"Confirm you did not hedge (long & short on the same/correlated instrument).",
+    help:"Do not hold long and short positions at the same time across the same or correlated instruments/groups.",
+    how:"How to check: look for overlapping timestamps where you were long one instrument while short another in the same correlation group."
+  },
+  {
+    key:"direction",
+    label:"One Direction Rule",
+    fix:"Confirm you did not have conflicting long & short positions or orders.",
+    help:"Do not run entry logic that actively works both sides at once; you should be biased one direction at a time.",
+    how:"How to check: confirm you didn’t have active entry orders on both sides simultaneously, or long + short positions at the same time."
+  }
+];
+
+const RULE_LINKS = {
+  scaling: "https://support.apextraderfunding.com/hc/en-us/articles/40463165052955-Contract-Scaling-Rule",
+  mae: "https://support.apextraderfunding.com/hc/en-us/articles/40463232267035-30-Negative-P-L-Rule-Maximum-Adverse-Excursion-MAE",
+  risk: "https://support.apextraderfunding.com/hc/en-us/articles/40463462503067-5-1-Risk-Reward-Ratio-Rule",
+  hedge: "https://support.apextraderfunding.com/hc/en-us/articles/40463541656603-Hedging-and-Correlated-Instruments-Rule",
+  direction: "https://support.apextraderfunding.com/hc/en-us/articles/40463473205275-One-Direction-Rule-Directionally-biased-trading"
+};
+
+const $ = s => document.querySelector(s);
+const fmt = n => (n==null || Number.isNaN(n) ? "—" : Number(n).toLocaleString(undefined,{maximumFractionDigits:2}));
+const num = s => {
+  const v = Number(String(s||"").replace(/[^0-9.-]/g,""));
+  return Number.isFinite(v) ? v : 0;
+};
+const clamp = (x,a,b)=>Math.max(a,Math.min(b,x));
+
+/* ---------- Build Trading Rule Checkbox UI ---------- */
+const rulesList = $("#rulesList");
+rulesList.innerHTML = "";
+TRADING_RULES.forEach(rule => {
+  const li = document.createElement("li");
+li.innerHTML = `
+  <div class="rule-main">
+    <input type="checkbox" id="rule_${rule.key}" data-rule="${rule.key}" />
+    <label for="rule_${rule.key}">${rule.label}</label>
+
+    <button type="button"
+      class="rule-help-btn"
+      data-help="${rule.key}"
+      aria-label="Explain ${rule.label}">
+      ?
+    </button>
+  </div>
+  <a href="${RULE_LINKS[rule.key]}" target="_blank" rel="noopener" class="rule-link">Learn more →</a>
+`;
+  rulesList.appendChild(li);
+});
+
+/* ---------- Core evaluation (full logic + trading rules) ---------- */
+function evaluate(inputs){
+  if (!inputs.account || !ACCOUNT_CONFIG[inputs.account]) {
+  return {
+    eligible: false,
+    reasons: [
+      {
+        pass: false,
+        label: "Account size selected",
+        detail: "You must select an account size to evaluate payout eligibility."
+      }
+    ],
+    advice: ["Select your PA account size."],
+    computed: {
+      safetyNetRequired: null,
+      safetyNetAmount: null,
+      minBalanceToRequest: null,
+      minPayout: 500,
+      maxPayoutCap: null,
+      mustLeaveAfterPayout: null,
+      payoutRangeAllowed: null
+    }
+  };
+}
+  const cfg = ACCOUNT_CONFIG[inputs.account];
+  const payoutNum = clamp(Math.floor(inputs.payoutNumber||0),1,99);
+  const minPayout = 500;
+
+  // Standard PA logic
+  const safetyNetRequired = payoutNum <= 3;
+  const safetyNetAmount = cfg.minReqBalanceFirst3 - cfg.startBalance;
+  const minBalanceToRequest = safetyNetRequired ? cfg.minReqBalanceFirst3 : cfg.startBalance + 100;
+
+  const windfallRuleApplies = payoutNum < 6;
+  const baseline = cfg.startBalance;
+  const totalProfit = Math.max(0, inputs.currentBalance - baseline);
+  const windfallPass = !windfallRuleApplies
+    ? true
+    : (totalProfit === 0
+        ? false
+        : (inputs.highestProfitDaySinceRef / totalProfit) <= 0.3);
+
+  const eightDaysPass = inputs.tradingDaysSinceRef >= 8;
+  const fiveDays50Pass = inputs.profitableDaysOver50SinceRef >= 5;
+
+  const maxPayoutCap = payoutNum <= 5 ? (MAX_PAYOUT_FIRST_FIVE[inputs.account] ?? null) : null;
+
+  const meetsMinBalance = inputs.currentBalance >= minBalanceToRequest;
+  const canLeaveMinAfter = inputs.currentBalance - inputs.requestedPayout >= minBalanceToRequest;
+  const meetsMinRequest = inputs.requestedPayout >= minPayout;
+  const underMaxCap = (maxPayoutCap==null) ? true : inputs.requestedPayout <= maxPayoutCap;
+
+  let safetyNetEncroachmentOK = true;
+  if (safetyNetRequired){
+    const overage = Math.max(0, inputs.requestedPayout - minPayout);
+    const mustHave = cfg.minReqBalanceFirst3 + overage;
+    safetyNetEncroachmentOK =
+      inputs.requestedPayout === minPayout
+        ? inputs.currentBalance >= cfg.minReqBalanceFirst3
+        : inputs.currentBalance >= mustHave;
+  }
+
+const paActive = inputs.paStatus === "Active";
+const paStatusSelected = inputs.paStatus !== "";
+  const reasons = [
+{
+  pass: inputs.paStatus === "Active",
+  label: "Performance Account is active",
+  detail:
+    inputs.paStatus === "Active"
+      ? "Account is in good standing."
+      : inputs.paStatus === ""
+        ? "Status: Not selected — please choose the PA status."
+        : inputs.paStatus === "Account Blown"
+          ? "Status: Account Blown — this account is not eligible for payout."
+          : inputs.paStatus === "Failed Rebill"
+            ? "Status: Failed Rebill — this account is not eligible for payout."
+            : inputs.paStatus === "Invoice Cancelled"
+              ? "Status: Invoice Cancelled — this account is not eligible for payout."
+              : `Status: ${inputs.paStatus} — not eligible for payout.`
+},
+    {
+      pass: eightDaysPass,
+      label: "≥ 8 trading days since last APPROVED payout (or start)",
+      detail: `You have ${inputs.tradingDaysSinceRef} day(s).`
+    },
+    {
+      pass: fiveDays50Pass,
+      label: "≥ 5 days with ≥ $50 profit (in the same period)",
+      detail: `You have ${inputs.profitableDaysOver50SinceRef} day(s).`
+    },
+    {
+      pass: windfallPass,
+      label: windfallRuleApplies
+        ? "30% consistency rule met (no single day > 30% of total profit)"
+        : "30% rule not in effect (≥ 6th payout)",
+      detail: windfallRuleApplies
+        ? `Highest day: $${fmt(inputs.highestProfitDaySinceRef)} | Total profit: $${fmt(totalProfit)} | Ratio: ${totalProfit>0?((inputs.highestProfitDaySinceRef/Math.max(1,totalProfit))*100).toFixed(1):"—"}%`
+        : undefined
+    },
+    {
+      pass: meetsMinBalance,
+      label: safetyNetRequired
+        ? `Meets safety net balance (≥ $${fmt(minBalanceToRequest)})`
+        : `Meets trailing DD stop balance (≥ $${fmt(minBalanceToRequest)})`,
+      detail: `Current balance: $${fmt(inputs.currentBalance)}`
+    },
+    {
+      pass: meetsMinRequest,
+      label: `Requested payout ≥ $${fmt(minPayout)}`
+    },
+    {
+      pass: underMaxCap,
+      label: maxPayoutCap==null
+        ? "No max payout cap (≥ 6th payout)"
+        : `Under max payout cap for this account & payout # (≤ $${fmt(maxPayoutCap)})`
+    },
+    {
+      pass: safetyNetRequired ? safetyNetEncroachmentOK : canLeaveMinAfter,
+      label: safetyNetRequired
+        ? (inputs.requestedPayout===minPayout
+            ? "Min $500 allowed even if ending encroaches safety net by $500"
+            : "Balance exceeds safety net by amount over $500 requested")
+        : "Sufficient balance remains after payout (≥ trailing stop)",
+      detail: safetyNetRequired
+        ? (inputs.requestedPayout===minPayout
+            ? `Need ≥ $${fmt(minBalanceToRequest)} before request. Ending can be as low as $${fmt(minBalanceToRequest - 500)}.`
+            : `For request of $${fmt(inputs.requestedPayout)}, need balance ≥ $${fmt(minBalanceToRequest + Math.max(0, inputs.requestedPayout - 500))}.`)
+        : `Post-payout balance would be $${fmt(inputs.currentBalance - inputs.requestedPayout)}. Must be ≥ $${fmt(minBalanceToRequest)}.`
+    },
+  ];
+
+  const advice = [];
+  if (!eightDaysPass) advice.push("Trade more days until you hit 8 since the last approved payout.");
+  if (!fiveDays50Pass) advice.push("You need at least 5 days with ≥ $50 profit in the same period.");
+  if (windfallRuleApplies && !reasons[3].pass){
+    advice.push(`Your highest day ($${fmt(inputs.highestProfitDaySinceRef)}) is >30% of total profit ($${fmt(totalProfit)}). Keep trading until total profit is at least $${fmt(Math.ceil(inputs.highestProfitDaySinceRef/0.3))}.`);
+  }
+  if (!reasons[4].pass){
+    advice.push(
+      safetyNetRequired
+        ? `Build balance to at least $${fmt(minBalanceToRequest)} to satisfy the safety net.`
+        : `Build balance to at least $${fmt(minBalanceToRequest)} (trailing DD stop).`
+    );
+  }
+  if (maxPayoutCap!=null && !reasons[6].pass){
+    advice.push(`Requested payout exceeds the max cap of $${fmt(maxPayoutCap)} for this payout number.`);
+  }
+
+  // Trading rules (checkboxes) are REQUIRED
+  TRADING_RULES.forEach(rule => {
+    const box = document.querySelector(`#rule_${rule.key}`);
+    const checked = !!(box && box.checked);
+    reasons.push({
+      pass: checked,
+      label: rule.label,
+      detail: checked
+        ? "You confirmed you followed this trading rule for this payout period."
+        : "You must confirm you followed this rule before requesting payout."
+    });
+    if (!checked){
+      advice.push(rule.fix);
+    }
+  });
+
+  // Final eligibility
+  const eligible = reasons.every(r=>r.pass);
+
+  let payoutRangeAllowed = null;
+  if (eligible){
+    const minAllowed = 500;
+    let byBalance = safetyNetRequired
+      ? Math.max(500, 500 + Math.max(0, inputs.currentBalance - minBalanceToRequest))
+      : inputs.currentBalance - minBalanceToRequest;
+    let maxAllowed = Math.floor(byBalance);
+    if (maxPayoutCap != null) maxAllowed = Math.min(maxAllowed, maxPayoutCap);
+    if (maxAllowed >= minAllowed) payoutRangeAllowed = { min:minAllowed, max:maxAllowed };
+  }
+
+  return {
+    eligible,
+    reasons,
+    advice,
+    computed:{
+      safetyNetRequired,
+      safetyNetAmount,
+      minBalanceToRequest,
+      minPayout,
+      maxPayoutCap: maxPayoutCap ?? null,
+      mustLeaveAfterPayout: minBalanceToRequest,
+      payoutRangeAllowed
+    }
+  };
+}
+
+/* ---------- Wire up UI ---------- */
+const fields = {
+  paStatus: $("#paStatus"),
+  account: $("#accountSize"),
+payoutNumber: $("#payoutNumber"),
+  currentBalance: $("#currentBalance"),
+  requestedPayout: $("#desiredPayout"),
+  highestProfitDay: $("#highestProfitDay"),
+  tradingDays: $("#daysSinceRequest"),
+  profitableDays: $("#profitableDays"),
+};
+
+const summary = {
+  yesno: $("#yesno"),
+  safetyReq: $("#safetyReq"),
+  safetyAmt: $("#safetyAmt"),
+  minBal: $("#minBal"),
+  minPay: $("#minPay"),
+  maxCap: $("#maxCap"),
+  rangeWrap: $("#rangeWrap"),
+  range: $("#range"),
+  card: $("#summaryCard"),
+  checklist: $("#checklist"),
+  adviceWrap: $("#adviceWrap"),
+  adviceList: $("#adviceList"),
+};
+
+const checklistHeader = document.getElementById("checklistHeader");
+const checklistBody = document.getElementById("checklistBody");
+const checklistIcon = document.getElementById("checklistIcon");
+
+function getInputs(){
+  const payoutRaw = (fields.payoutNumber?.value || "").trim();
+  const payoutNumber = payoutRaw ? Math.floor(num(payoutRaw)) : null;
+
+  return {
+    paStatus: fields.paStatus?.value || "",
+    account: fields.account?.value || null,
+    payoutNumber,
+    currentBalance: num(fields.currentBalance?.value),
+    highestProfitDaySinceRef: num(fields.highestProfitDay?.value),
+    tradingDaysSinceRef: Math.max(0, Math.floor(num(fields.tradingDays?.value))),
+    profitableDaysOver50SinceRef: Math.max(0, Math.floor(num(fields.profitableDays?.value))),
+    requestedPayout: num(fields.requestedPayout?.value),
+  };
+}
+function updateInputGlow() {
+const inputIdMap = {
+  requestedPayout: "desiredPayout",
+  tradingDays: "daysSinceRequest",
+  currentBalance: "currentBalance",
+  highestProfitDay: "highestProfitDay",
+  profitableDays: "profitableDays"
+};
+
+const dropdownIdMap = {
+  paStatus: "paStatus",
+  account: "accountSize",
+  payoutNumber: "payoutNumber",
+};
+const requiredInputs = [
+  "requestedPayout",
+  "tradingDays",
+  "currentBalance",
+  "highestProfitDay",
+  "profitableDays"
+];
+
+const requiredDropdowns = [
+  "paStatus",
+  "account",
+  "payoutNumber",
+];
+const requiredCheckboxes = [
+    "rule_scaling",
+    "rule_mae",
+    "rule_risk",
+    "rule_hedge",
+    "rule_direction"
+];
+
+// Text inputs (all must be filled; "0" counts as filled)
+requiredInputs.forEach(key => {
+  const domId = inputIdMap[key];
+  const el = document.getElementById(domId);
+  if (!el) return;
+
+  // A field is VALID (green) as long as it is NOT empty
+  // So: "" = red, "0" = green, "123" = green
+  let hasValue = el.value.trim() !== "";
+
+  el.classList.toggle("required-empty", !hasValue);
+  el.classList.toggle("required-filled", hasValue);
+});
+
+// Dropdowns
+requiredDropdowns.forEach(key => {
+  const domId = dropdownIdMap[key];
+  const el = document.getElementById(domId);
+  if (!el) return;
+
+  let hasValue = el.value.trim() !== "";
+
+  // SPECIAL CASE:
+  // If approvedCount == 0 AND payoutStatus == "none"
+  // → treat as filled (green)
+  el.classList.toggle("required-empty", !hasValue);
+  el.classList.toggle("required-filled", hasValue);
+});
+
+  // Checkboxes
+  requiredCheckboxes.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    const wrapper = el.closest("li"); // glow whole row
+    const checked = el.checked;
+
+    wrapper.classList.toggle("checkbox-required-empty", !checked);
+    wrapper.classList.toggle("checkbox-required-filled", checked);
+  });
+}
+
+function render(){
+  const inputs = getInputs();
+  const res = evaluate(inputs);
+
+  // Treat as INCOMPLETE if required dropdowns aren’t selected yet
+  const incomplete =
+    !inputs.paStatus ||
+    !inputs.account ||
+    !inputs.payoutNumber;
+
+  // Status text + pill style
+  summary.yesno.innerHTML = '';
+  summary.yesno.className = 'pill' + ((incomplete || !res.eligible) ? ' pill-bad' : '');
+
+  const dot = document.createElement('span');
+  dot.className = 'dot';
+
+  const text = document.createElement('span');
+  text.textContent = incomplete ? 'INCOMPLETE' : (res.eligible ? 'YES' : 'NO');
+
+  summary.yesno.appendChild(dot);
+  summary.yesno.appendChild(text);
+
+  // Border color (only green when complete + eligible)
+  summary.card.style.borderColor = (!incomplete && res.eligible) ? "#22c55e" : "#fb7185";
+
+  // summary numbers (show dashes when incomplete)
+  if (incomplete) {
+    summary.safetyReq.textContent = "—";
+    summary.safetyAmt.textContent = "—";
+    summary.minBal.textContent = "—";
+    summary.minPay.textContent = "$500";
+    summary.maxCap.textContent = "—";
+    summary.rangeWrap.style.display = "none";
+  } else {
+    summary.safetyReq.textContent = res.computed.safetyNetRequired ? "Yes (first 3 payouts)" : "No";
+    summary.safetyAmt.textContent = `$${fmt(res.computed.safetyNetAmount)}`;
+    summary.minBal.textContent = `$${fmt(res.computed.minBalanceToRequest)}`;
+    summary.minPay.textContent = `$${fmt(res.computed.minPayout)}`;
+    summary.maxCap.textContent = res.computed.maxPayoutCap ? `$${fmt(res.computed.maxPayoutCap)}` : "No cap (≥6th)";
+
+    if (res.computed.payoutRangeAllowed){
+      summary.rangeWrap.style.display = "block";
+      summary.range.textContent = `$${fmt(res.computed.payoutRangeAllowed.min)} – $${fmt(res.computed.payoutRangeAllowed.max)}`;
+    } else {
+      summary.rangeWrap.style.display = "none";
+    }
+  }
+
+  // checklist
+  summary.checklist.innerHTML = "";
+  res.reasons.forEach(r=>{
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+           stroke="${r.pass ? '#22c55e' : '#fb7185'}" stroke-width="2" style="margin-top:2px">
+        ${r.pass
+          ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><path d="M22 4 12 14.01l-3-3"></path>'
+          : '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>'}
+      </svg>
+      <div>
+        <div style="font-weight:600;font-size:12px">${r.label}</div>
+        ${r.detail ? `<div class="help">${r.detail}</div>` : ""}
+      </div>`;
+    summary.checklist.appendChild(li);
+  });
+
+  // checklist alert badge (if closed and has failures)
+  const checklistAlert = document.getElementById("checklistAlert");
+  const checklistClosed = checklistBody.style.display !== "block";
+  const hasFailures = res.reasons.some(r => !r.pass);
+
+  if (hasFailures && checklistClosed) {
+    checklistAlert.style.display = "inline-flex";
+    checklistAlert.className = "checklist-alert";
+    checklistAlert.textContent = "Needs Attention";
+  } else {
+    checklistAlert.style.display = "none";
+  }
+
+  // advice (What to Fix)
+  summary.adviceList.innerHTML = "";
+  if (res.advice.length){
+    summary.adviceWrap.style.display = "block";
+    res.advice.forEach(a=>{
+      const li = document.createElement("li");
+      li.innerHTML = `<div class="help" style="font-size:14px;">${a}</div>`;
+      summary.adviceList.appendChild(li);
+    });
+  } else {
+    summary.adviceWrap.style.display = "none";
+  }
+}
+
+// input listeners (including rule checkboxes)
+document.querySelectorAll("input, select").forEach(el =>
+  el.addEventListener("input", () => {
+    updateInputGlow();
+    render();
+  })
+);
+ // PA Status dropdown needs a change listener (not just input)
+if (fields.paStatus) {
+  fields.paStatus.addEventListener("change", () => {
+    updateInputGlow();
+    render();
+  });
+}
+
+// Accordion toggle for Eligibility Checklist
+if (checklistHeader && checklistBody && checklistIcon) {
+  checklistHeader.addEventListener("click", () => {
+    const isOpen = checklistBody.style.display === "block";
+    checklistBody.style.display = isOpen ? "none" : "block";
+    checklistIcon.textContent = isOpen ? "▶" : "▼";
+    render();
+  });
+}
+  // Full compliance rules accordion
+const rulesExplainHeader = document.getElementById("rulesExplainHeader");
+const rulesExplainBody = document.getElementById("rulesExplainBody");
+const rulesExplainIcon = document.getElementById("rulesExplainIcon");
+
+if (rulesExplainHeader && rulesExplainBody && rulesExplainIcon) {
+  rulesExplainHeader.addEventListener("click", () => {
+    const isOpen = rulesExplainBody.style.display === "block";
+    rulesExplainBody.style.display = isOpen ? "none" : "block";
+    rulesExplainIcon.textContent = isOpen ? "▶" : "▼";
+  });
+}
+  // Scaling dropdown toggle
+const scalingToggle = document.getElementById("scalingToggle");
+const scalingList = document.getElementById("scalingList");
+
+if (scalingToggle && scalingList) {
+  scalingToggle.addEventListener("click", (e) => {
+    e.preventDefault();
+    const isHidden = getComputedStyle(scalingList).display === "none";
+    scalingList.style.display = isHidden ? "block" : "none";
+  });
+}
+
+// Correlated instruments dropdown toggle
+const corrToggle = document.getElementById("corrToggle");
+const corrList = document.getElementById("corrList");
+
+if (corrToggle && corrList) {
+  corrToggle.addEventListener("click", (e) => {
+    e.preventDefault();
+    const isHidden = getComputedStyle(corrList).display === "none";
+    corrList.style.display = isHidden ? "block" : "none";
+  });
+}
+// MAE dropdown toggle
+const maeToggle = document.getElementById("maeToggle");
+const maeList = document.getElementById("maeList");
+
+if (maeToggle && maeList) {
+  maeToggle.addEventListener("click", (e) => {
+    e.preventDefault();
+    const isHidden = getComputedStyle(maeList).display === "none";
+    maeList.style.display = isHidden ? "block" : "none";
+  });
+}
+/* ===== ADD THIS BLOCK HERE (modal open/close wiring) ===== */
+const dlg = document.getElementById("ruleHelpDialog");
+const dlgTitle = document.getElementById("ruleHelpTitle");
+const dlgBody  = document.getElementById("ruleHelpBody");
+const dlgHow   = document.getElementById("ruleHelpHow");
+const dlgLink  = document.getElementById("ruleHelpLink");
+const dlgClose = document.getElementById("ruleHelpClose");
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-help]");
+  if (!btn) return;
+
+  const key = btn.getAttribute("data-help");
+  const rule = TRADING_RULES.find(r => r.key === key);
+  if (!rule) return;
+
+  dlgTitle.textContent = rule.label;
+  dlgBody.textContent = rule.help || "";
+  dlgHow.textContent  = rule.how || "";
+  dlgLink.href = RULE_LINKS[key] || "#";
+
+  if (dlg && !dlg.open) dlg.showModal();
+});
+
+dlgClose?.addEventListener("click", () => dlg?.close());
+dlg?.addEventListener("click", (e) => {
+  const rect = dlg.getBoundingClientRect();
+  const inDialog =
+    (e.clientX >= rect.left && e.clientX <= rect.right &&
+     e.clientY >= rect.top  && e.clientY <= rect.bottom);
+  if (!inDialog) dlg.close();
+});
+/* ===== END ADD BLOCK ===== */
+
+updateInputGlow();
+render();
+
+}); // DOMContentLoaded
+</script>
+<dialog id="ruleHelpDialog" style="
+  border:1px solid rgba(148,163,184,.22);
+  border-radius:14px;
+  background:#0b1224;
+  color:#e5e7eb;
+  padding:14px 14px 12px;
+  max-width:560px;
+  width:calc(100% - 28px);
+">
+  <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+    <div>
+      <div id="ruleHelpTitle" style="font-weight:800;font-size:14px;color:#93c5fd;"></div>
+      <div id="ruleHelpBody" class="help" style="margin-top:6px;font-size:13px;"></div>
+      <div id="ruleHelpHow" class="help" style="margin-top:10px;font-size:12px;color:#9ca3af;"></div>
+      <div style="margin-top:10px;">
+        <a id="ruleHelpLink" target="_blank" rel="noopener" style="font-size:12px;color:#93c5fd;text-decoration:none;">Read official rule →</a>
+      </div>
+    </div>
+    <button id="ruleHelpClose" class="input" style="width:auto;padding:6px 10px;font-size:12px;">Close</button>
+  </div>
+</dialog>
+</body>
+</html>
